@@ -10,6 +10,10 @@ import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import Login from "@/pages/Login";
 import Admin from "@/pages/Admin";
+import Occasions from "@/pages/Occasions";
+import Collections from "@/pages/Collections";
+import AboutUs from "@/pages/AboutUs";
+import Sale from "@/pages/Sale";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,6 +27,10 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/categories" component={Products} />
       <Route path="/new-arrivals" component={Products} />
+      <Route path="/occasions" component={Occasions} />
+      <Route path="/collections" component={Collections} />
+      <Route path="/about" component={AboutUs} />
+      <Route path="/sale" component={Sale} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
