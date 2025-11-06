@@ -66,6 +66,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (inStock === 'true') query.inStock = true;
+      if (req.query.isNew === 'true') query.isNew = true;
+      if (req.query.isBestseller === 'true') query.isBestseller = true;
       if (minPrice || maxPrice) {
         query.price = {};
         if (minPrice) query.price.$gte = Number(minPrice);

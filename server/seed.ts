@@ -3,10 +3,10 @@ import { Product } from './models';
 
 const sampleProducts = [
   {
-    name: "Cream Kanchi Kalamkari Elegant Saree",
+    name: "Royal Beige Kalamkari Heritage Saree",
     description: "Exquisite Kanchi Kalamkari saree in cream with traditional red blouse. Features intricate hand-painted designs and gold border work.",
-    price: 1450,
-    originalPrice: 2895,
+    price: 2899,
+    originalPrice: 5799,
     images: ["/attached_assets/image_1762454060438.png"],
     category: "Silk Sarees",
     subcategory: "Kanjeevaram",
@@ -32,10 +32,10 @@ const sampleProducts = [
     }
   },
   {
-    name: "Radiant Harmony Katan Silk Saree",
+    name: "Vibrant Multicolor Festive Saree",
     description: "Stunning multicolor Katan silk saree with vibrant blue, teal, and pink hues. Perfect for festive occasions.",
-    price: 999,
-    originalPrice: 1895,
+    price: 1799,
+    originalPrice: 3599,
     images: ["/attached_assets/image_1762454101408.png"],
     category: "Silk Sarees",
     subcategory: "Katan",
@@ -61,10 +61,10 @@ const sampleProducts = [
     }
   },
   {
-    name: "Black And White Poly Chiffon Saree",
+    name: "Elegant Monochrome Designer Saree",
     description: "Contemporary black and white poly chiffon saree with elegant drape. Perfect for modern fashionistas.",
-    price: 1450,
-    originalPrice: 2995,
+    price: 2299,
+    originalPrice: 4599,
     images: ["/attached_assets/image_1762454138686.png"],
     category: "Designer Sarees",
     subcategory: "Contemporary",
@@ -90,10 +90,10 @@ const sampleProducts = [
     }
   },
   {
-    name: "Lime Banarasi Katan Silk Saree",
+    name: "Premium Lime Banarasi Silk Saree",
     description: "Vibrant lime green and purple Banarasi Katan silk saree with traditional gold border. A showstopper for any celebration.",
-    price: 999,
-    originalPrice: 2065,
+    price: 3499,
+    originalPrice: 6999,
     images: ["/attached_assets/image_1762454177115.png"],
     category: "Silk Sarees",
     subcategory: "Banarasi",
@@ -119,10 +119,10 @@ const sampleProducts = [
     }
   },
   {
-    name: "Rose Pink Jacquard Tissue Saree",
+    name: "Luxurious Pink Tissue Party Saree",
     description: "Elegant rose pink jacquard tissue saree with gold embellished border. Perfect for special occasions.",
-    price: 1450,
-    originalPrice: 2895,
+    price: 2599,
+    originalPrice: 5199,
     images: ["/attached_assets/image_1762454236234.png"],
     category: "Designer Sarees",
     subcategory: "Tissue",
@@ -148,10 +148,10 @@ const sampleProducts = [
     }
   },
   {
-    name: "Purple Kota Doria Embroidered Saree",
+    name: "Graceful Purple Kota Doria Saree",
     description: "Beautiful grey-purple Kota Doria saree with intricate embroidery. Lightweight and elegant for daytime events.",
-    price: 1495,
-    originalPrice: 2995,
+    price: 1999,
+    originalPrice: 3999,
     images: ["/attached_assets/image_1762454265222.png"],
     category: "Designer Sarees",
     subcategory: "Kota Doria",
