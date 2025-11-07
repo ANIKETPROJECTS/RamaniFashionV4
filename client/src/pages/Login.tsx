@@ -15,6 +15,7 @@ export default function Login() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isRegister, setIsRegister] = useState(false);
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,6 +37,19 @@ export default function Login() {
     },
   });
 
+  const adminLoginMutation = useMutation({
+    mutationFn: (data: any) => apiRequest("/api/admin/login", "POST", data),
+    onSuccess: (data: any) => {
+      localStorage.setItem("adminToken", data.token);
+      localStorage.setItem("admin", JSON.stringify(data.admin));
+      toast({ title: "Admin login successful!" });
+      setLocation("/admin/dashboard");
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Invalid admin credentials", variant: "destructive" });
+    },
+  });
+
   const registerMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/auth/register", "POST", data),
     onSuccess: async (data: any) => {
@@ -52,7 +66,9 @@ export default function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isRegister) {
+    if (isAdminLogin) {
+      adminLoginMutation.mutate({ username: formData.email, password: formData.password });
+    } else if (isRegister) {
       registerMutation.mutate(formData);
     } else {
       loginMutation.mutate({ email: formData.email, password: formData.password });
@@ -66,14 +82,18 @@ export default function Login() {
       <div className="max-w-md mx-auto px-4 py-12">
         <Card>
           <CardHeader>
-            <CardTitle>{isRegister ? "Create Account" : "Welcome Back"}</CardTitle>
+            <CardTitle>
+              {isAdminLogin ? "Admin Login" : (isRegister ? "Create Account" : "Welcome Back")}
+            </CardTitle>
             <CardDescription>
-              {isRegister ? "Sign up to start shopping" : "Sign in to your account"}
+              {isAdminLogin 
+                ? "Sign in to access the admin panel" 
+                : (isRegister ? "Sign up to start shopping" : "Sign in to your account")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {isRegister && (
+              {!isAdminLogin && isRegister && (
                 <div>
                   <Label htmlFor="name">Full Name</Label>
                   <Input
@@ -87,10 +107,10 @@ export default function Login() {
               )}
 
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{isAdminLogin ? "Admin Username" : "Email"}</Label>
                 <Input
                   id="email"
-                  type="email"
+                  type={isAdminLogin ? "text" : "email"}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
@@ -110,7 +130,7 @@ export default function Login() {
                 />
               </div>
 
-              {isRegister && (
+              {!isAdminLogin && isRegister && (
                 <div>
                   <Label htmlFor="phone">Phone Number (Optional)</Label>
                   <Input
@@ -126,20 +146,38 @@ export default function Login() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={loginMutation.isPending || registerMutation.isPending}
+                disabled={loginMutation.isPending || registerMutation.isPending || adminLoginMutation.isPending}
                 data-testid="button-submit"
               >
-                {isRegister ? "Sign Up" : "Sign In"}
+                {isAdminLogin ? "Admin Sign In" : (isRegister ? "Sign Up" : "Sign In")}
               </Button>
 
-              <div className="text-center">
+              {!isAdminLogin && (
+                <div className="text-center">
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={() => setIsRegister(!isRegister)}
+                    data-testid="button-toggle-mode"
+                  >
+                    {isRegister ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+                  </Button>
+                </div>
+              )}
+
+              <div className="text-center pt-4 border-t">
                 <Button
                   type="button"
-                  variant="link"
-                  onClick={() => setIsRegister(!isRegister)}
-                  data-testid="button-toggle-mode"
+                  variant="outline"
+                  onClick={() => {
+                    setIsAdminLogin(!isAdminLogin);
+                    setIsRegister(false);
+                    setFormData({ name: "", email: "", password: "", phone: "" });
+                  }}
+                  data-testid="button-admin-toggle"
+                  className="w-full"
                 >
-                  {isRegister ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+                  {isAdminLogin ? "Back to User Login" : "Login as Admin"}
                 </Button>
               </div>
             </form>

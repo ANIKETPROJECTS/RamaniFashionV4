@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "ramani-fashion-secret-key";
+const ADMIN_JWT_SECRET = process.env.ADMIN_SESSION_SECRET || "ramani-admin-secret-key-2024";
 
 // Middleware to verify JWT token
 function authenticateToken(req: any, res: any, next: any) {
@@ -19,6 +20,25 @@ function authenticateToken(req: any, res: any, next: any) {
   jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
     if (err) return res.status(403).json({ error: 'Invalid token' });
     req.user = user;
+    next();
+  });
+}
+
+// Middleware to verify admin JWT token
+function authenticateAdmin(req: any, res: any, next: any) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Admin authentication required' });
+  }
+
+  jwt.verify(token, ADMIN_JWT_SECRET, (err: any, admin: any) => {
+    if (err) return res.status(403).json({ error: 'Invalid admin token' });
+    if (admin.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    req.admin = admin;
     next();
   });
 }
@@ -120,7 +140,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/products", async (req, res) => {
+  // Legacy product mutation routes - now protected with admin authentication
+  app.post("/api/products", authenticateAdmin, async (req, res) => {
     try {
       const product = new Product(req.body);
       await product.save();
@@ -130,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/products/:id", async (req, res) => {
+  app.put("/api/products/:id", authenticateAdmin, async (req, res) => {
     try {
       const product = await Product.findByIdAndUpdate(
         req.params.id,
@@ -146,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/products/:id", async (req, res) => {
+  app.delete("/api/products/:id", authenticateAdmin, async (req, res) => {
     try {
       const product = await Product.findByIdAndDelete(req.params.id);
       if (!product) {
@@ -542,6 +563,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .sort({ createdAt: -1 })
         .lean();
       res.json(submissions);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Admin Authentication Routes
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      // Hardcoded admin credentials for now (TODO: move to database)
+      const ADMIN_USERNAME = "admin@ramanifashion.com";
+      const ADMIN_PASSWORD = "admin123";
+
+      if (username !== ADMIN_USERNAME) {
+        return res.status(401).json({ error: 'Invalid admin credentials' });
+      }
+
+      if (password !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: 'Invalid admin credentials' });
+      }
+
+      const token = jwt.sign(
+        { adminId: 'admin-1', username: ADMIN_USERNAME, role: 'admin' },
+        ADMIN_JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      res.json({
+        token,
+        admin: { id: 'admin-1', username: ADMIN_USERNAME, role: 'admin' }
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/verify", authenticateAdmin, async (req, res) => {
+    res.json({ valid: true, admin: req.admin });
+  });
+
+  // Admin Product Management (protected)
+  app.post("/api/admin/products", authenticateAdmin, async (req, res) => {
+    try {
+      const product = new Product(req.body);
+      await product.save();
+      res.status(201).json(product);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/products/:id", authenticateAdmin, async (req, res) => {
+    try {
+      const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        { ...req.body, updatedAt: new Date() },
+        { new: true }
+      );
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      res.json(product);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/admin/products/:id", authenticateAdmin, async (req, res) => {
+    try {
+      const product = await Product.findByIdAndDelete(req.params.id);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      res.json({ message: 'Product deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Admin Analytics Routes
+  app.get("/api/admin/analytics", authenticateAdmin, async (req, res) => {
+    try {
+      const totalProducts = await Product.countDocuments();
+      const totalUsers = await User.countDocuments();
+      const totalOrders = await Order.countDocuments();
+      
+      const orders = await Order.find().lean();
+      const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+      
+      const lowStockProducts = await Product.countDocuments({ stockQuantity: { $lt: 10 } });
+      const outOfStockProducts = await Product.countDocuments({ inStock: false });
+      
+      const recentOrders = await Order.find()
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .populate('userId', 'name email')
+        .lean();
+
+      const topProducts = await Product.find()
+        .sort({ rating: -1 })
+        .limit(5)
+        .lean();
+
+      res.json({
+        totalProducts,
+        totalUsers,
+        totalOrders,
+        totalRevenue,
+        lowStockProducts,
+        outOfStockProducts,
+        recentOrders,
+        topProducts
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/customers", authenticateAdmin, async (req, res) => {
+    try {
+      const customers = await User.find().select('-password').lean();
+      
+      const customersWithStats = await Promise.all(
+        customers.map(async (customer) => {
+          const orders = await Order.find({ userId: customer._id }).lean();
+          const wishlist = await Wishlist.findOne({ userId: customer._id }).lean();
+          
+          return {
+            ...customer,
+            totalOrders: orders.length,
+            totalSpent: orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0),
+            wishlistCount: wishlist?.products?.length || 0
+          };
+        })
+      );
+
+      res.json(customersWithStats);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/orders", authenticateAdmin, async (req, res) => {
+    try {
+      const orders = await Order.find()
+        .sort({ createdAt: -1 })
+        .populate('userId', 'name email phone')
+        .lean();
+      res.json(orders);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/admin/orders/:id/status", authenticateAdmin, async (req, res) => {
+    try {
+      const { status } = req.body;
+      const order = await Order.findByIdAndUpdate(
+        req.params.id,
+        { status, updatedAt: new Date() },
+        { new: true }
+      );
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+      res.json(order);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/inventory", authenticateAdmin, async (req, res) => {
+    try {
+      const products = await Product.find()
+        .select('name category stockQuantity inStock price images')
+        .sort({ stockQuantity: 1 })
+        .lean();
+      
+      res.json(products);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/admin/inventory/:id", authenticateAdmin, async (req, res) => {
+    try {
+      const { stockQuantity, inStock } = req.body;
+      const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        { stockQuantity, inStock, updatedAt: new Date() },
+        { new: true }
+      );
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      res.json(product);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

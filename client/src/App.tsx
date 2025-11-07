@@ -19,6 +19,11 @@ import Profile from "@/pages/Profile";
 import Orders from "@/pages/Orders";
 import Wishlist from "@/pages/Wishlist";
 import NotFound from "@/pages/not-found";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import ProductManagement from "@/pages/admin/ProductManagement";
+import InventoryManagement from "@/pages/admin/InventoryManagement";
+import Analytics from "@/pages/admin/Analytics";
+import Settings from "@/pages/admin/Settings";
 
 function Router() {
   return (
@@ -39,6 +44,11 @@ function Router() {
       <Route path="/orders" component={Orders} />
       <Route path="/wishlist" component={Wishlist} />
       <Route path="/admin" component={Admin} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/products" component={ProductManagement} />
+      <Route path="/admin/inventory" component={InventoryManagement} />
+      <Route path="/admin/analytics" component={Analytics} />
+      <Route path="/admin/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );
