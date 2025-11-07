@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ramani Fashion India is a full-stack e-commerce web application specializing in traditional Indian sarees and ethnic wear. The platform provides a sophisticated shopping experience with features including product browsing, filtering, cart management, wishlist functionality, user authentication, and order processing. Built with a modern tech stack, it combines elegant UI design with robust backend functionality to deliver a premium online shopping experience for traditional Indian fashion.
+Ramani Fashion India is a full-stack e-commerce web application specializing in traditional Indian sarees and ethnic wear. The platform provides a sophisticated shopping experience with features including product browsing, filtering, cart management, wishlist functionality, user authentication, order processing, and an integrated contact form with store location. Built with a modern tech stack, it combines elegant UI design with robust backend functionality to deliver a premium online shopping experience for traditional Indian fashion.
 
 ## User Preferences
 
