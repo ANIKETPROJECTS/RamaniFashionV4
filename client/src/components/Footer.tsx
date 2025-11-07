@@ -29,7 +29,7 @@ export default function Footer() {
             <p className="text-sm text-muted-foreground mb-4">
               Your destination for authentic handloom sarees and traditional Indian ethnic wear.
             </p>
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-8">
               <a 
                 href="https://instagram.com/ramanifashion" 
                 target="_blank" 

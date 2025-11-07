@@ -64,8 +64,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="grid grid-cols-3 items-center gap-6">
+      <div className="max-w-7xl mx-auto px-4 py-1.5">
+        <div className="grid grid-cols-3 items-center gap-4">
           <div className="flex items-start gap-3">
             <Button
               size="icon"
@@ -77,36 +77,36 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
               <Menu className="h-5 w-5" />
             </Button>
 
-            <div className="hidden md:flex items-start gap-8">
+            <div className="hidden md:flex items-start gap-6">
               <a 
                 href="https://instagram.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity group"
+                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity group"
                 data-testid="link-instagram"
               >
-                <img src={instagramIcon} alt="Instagram" className="h-6 w-6" />
-                <span className="text-xs font-medium text-black">@ramanifashion</span>
+                <img src={instagramIcon} alt="Instagram" className="h-5 w-5" />
+                <span className="text-[10px] font-medium text-black">@ramanifashion</span>
               </a>
               <a 
                 href="https://facebook.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity group"
+                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity group"
                 data-testid="link-facebook"
               >
-                <img src={facebookIcon} alt="Facebook" className="h-6 w-6" />
-                <span className="text-xs font-medium text-black">@ramanifashion</span>
+                <img src={facebookIcon} alt="Facebook" className="h-5 w-5" />
+                <span className="text-[10px] font-medium text-black">@ramanifashion</span>
               </a>
               <a 
                 href="https://wa.me/915555555555" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity group"
+                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity group"
                 data-testid="link-whatsapp"
               >
-                <SiWhatsapp className="h-6 w-6 text-green-600" />
-                <span className="text-xs font-medium text-black">+91 5555555555</span>
+                <SiWhatsapp className="h-5 w-5 text-green-600" />
+                <span className="text-[10px] font-medium text-black">+91 5555555555</span>
               </a>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
               <img 
                 src={logoImage}
                 alt="Ramani Fashion" 
-                className="h-16 md:h-20 lg:h-24 w-auto object-contain"
+                className="h-12 md:h-14 lg:h-16 w-auto object-contain"
                 data-testid="img-logo"
               />
             </a>
@@ -196,10 +196,10 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
         </div>
       </div>
 
-      <nav className="hidden md:block bg-white border-t">
+      <nav className="hidden md:block bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <NavigationMenu className="mx-auto">
-            <NavigationMenuList className="flex items-center justify-center gap-8 py-2">
+            <NavigationMenuList className="flex items-center justify-center gap-8 py-1.5">
               <NavigationMenuItem>
                 <a href="/" className="hover-elevate px-4 py-2 rounded-md tracking-wide text-base font-medium" data-testid="link-home">HOME</a>
               </NavigationMenuItem>
