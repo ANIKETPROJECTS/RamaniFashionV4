@@ -74,26 +74,45 @@ export default function Home() {
   ];
 
 
-  const testimonials = [
+  const ratingStats = {
+    overall: 4.5,
+    totalReviews: 2847,
+    totalRatings: 3156,
+    breakdown: [
+      { stars: 5, count: 1890, percentage: 60 },
+      { stars: 4, count: 823, percentage: 26 },
+      { stars: 3, count: 284, percentage: 9 },
+      { stars: 2, count: 95, percentage: 3 },
+      { stars: 1, count: 64, percentage: 2 },
+    ]
+  };
+
+  const customerReviews = [
     {
       name: "Priya Sharma",
       image: customerImage,
       rating: 5,
-      review: "Absolutely stunning saree! The quality is exceptional and the colors are even more beautiful in person.",
-      verified: true,
+      review: "Absolutely stunning saree! The quality is exceptional and the colors are even more beautiful in person. The fabric feels luxurious and drapes perfectly.",
+      date: "15 Oct 2025",
+      helpful: 24,
+      photos: [bridalImage, designerImage, festiveImage],
     },
     {
       name: "Anjali Reddy",
       rating: 5,
-      review: "Perfect for my sister's wedding. Got so many compliments! The fabric quality is amazing.",
-      verified: true,
+      review: "Perfect for my sister's wedding. Got so many compliments! The fabric quality is amazing and the color is exactly as shown in pictures.",
+      date: "8 Oct 2025",
+      helpful: 18,
+      photos: [partyImage, cottonImage],
     },
     {
       name: "Meera Patel",
       image: customerImage,
-      rating: 4,
-      review: "Beautiful collection and fast delivery. Will definitely shop again from Ramani Fashion.",
-      verified: true,
+      rating: 5,
+      review: "Beautiful collection and fast delivery. The saree exceeded my expectations. Will definitely shop again from Ramani Fashion!",
+      date: "2 Oct 2025",
+      helpful: 31,
+      photos: [casualImage],
     },
   ];
 
@@ -202,15 +221,87 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-card py-12">
+        <section className="bg-card py-16">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-8" data-testid="text-section-testimonials">
+            <h2 className="text-3xl font-bold text-center mb-12" data-testid="text-section-testimonials">
               What Our Customers Say
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {testimonials.map((testimonial) => (
-                <TestimonialCard key={testimonial.name} {...testimonial} />
-              ))}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+              <div className="lg:col-span-1">
+                <div className="bg-background rounded-xl p-8 shadow-sm border border-border">
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-6xl font-bold text-foreground">{ratingStats.overall}</span>
+                    <span className="text-4xl text-yellow-500">★</span>
+                  </div>
+                  <p className="text-muted-foreground mb-6">
+                    {ratingStats.totalRatings.toLocaleString()} Ratings, {ratingStats.totalReviews.toLocaleString()} Reviews
+                  </p>
+                  
+                  <div className="space-y-3">
+                    {ratingStats.breakdown.map((item) => (
+                      <div key={item.stars} className="flex items-center gap-3">
+                        <span className="text-sm font-medium w-8">{item.stars}★</span>
+                        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full transition-all duration-300"
+                            style={{ width: `${item.percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-muted-foreground w-12 text-right">
+                          {item.count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-2 space-y-6">
+                {customerReviews.map((review, index) => (
+                  <div key={index} className="bg-background rounded-xl p-6 shadow-sm border border-border">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0">
+                        {review.image ? (
+                          <img src={review.image} alt={review.name} className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                          <span className="text-xl font-semibold text-primary">
+                            {review.name.charAt(0)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-foreground">{review.name}</h4>
+                        <div className="flex items-center gap-3 mt-1">
+                          <div className="flex items-center gap-1 bg-green-600 text-white px-2 py-0.5 rounded text-sm font-medium">
+                            {review.rating}★
+                          </div>
+                          <span className="text-sm text-muted-foreground">Posted on {review.date}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-foreground leading-relaxed mb-4">{review.review}</p>
+
+                    {review.photos && review.photos.length > 0 && (
+                      <div className="flex gap-2 mb-4">
+                        {review.photos.slice(0, 3).map((photo, photoIndex) => (
+                          <div key={photoIndex} className="w-20 h-20 rounded-lg overflow-hidden border border-border">
+                            <img src={photo} alt={`Customer photo ${photoIndex + 1}`} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <button className="flex items-center gap-1 text-sm hover:text-foreground transition-colors">
+                        <span>👍</span>
+                        <span>Helpful ({review.helpful})</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
