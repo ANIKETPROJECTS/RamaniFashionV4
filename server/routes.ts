@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { connectDB } from "./db";
-import { Product, User, Cart, Wishlist, Order, Address, ContactSubmission } from "./models";
+import { Product, User, Cart, Wishlist, Order, Address, ContactSubmission, OTP } from "./models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -228,6 +228,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
         token,
         user: { id: user._id, name: user.name, email: user.email }
       });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // OTP Routes (Dummy Implementation)
+  app.post("/api/auth/send-otp", async (req, res) => {
+    try {
+      const { phone } = req.body;
+
+      if (!phone) {
+        return res.status(400).json({ error: 'Phone number is required' });
+      }
+
+      // Delete any existing OTP for this phone number
+      await OTP.deleteMany({ phone });
+
+      // Generate dummy OTP (always 123456 for testing)
+      const dummyOtp = "123456";
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+      const otp = new OTP({
+        phone,
+        otp: dummyOtp,
+        expiresAt
+      });
+
+      await otp.save();
+
+      // In production, you would send this OTP via SMS
+      // For now, we return it in the response for testing
+      res.json({ 
+        message: 'OTP sent successfully',
+        otp: dummyOtp // Remove this in production!
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/auth/verify-otp", async (req, res) => {
+    try {
+      const { phone, otp } = req.body;
+
+      if (!phone || !otp) {
+        return res.status(400).json({ error: 'Phone number and OTP are required' });
+      }
+
+      const otpRecord = await OTP.findOne({ phone, otp });
+
+      if (!otpRecord) {
+        return res.status(400).json({ error: 'Invalid OTP' });
+      }
+
+      if (new Date() > otpRecord.expiresAt) {
+        await OTP.deleteOne({ _id: otpRecord._id });
+        return res.status(400).json({ error: 'OTP expired' });
+      }
+
+      // Delete the used OTP
+      await OTP.deleteOne({ _id: otpRecord._id });
+
+      res.json({ message: 'OTP verified successfully', verified: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

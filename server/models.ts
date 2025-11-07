@@ -41,7 +41,16 @@ const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: { type: String },
+  phone: { type: String, required: true },
+  phoneVerified: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+});
+
+// OTP Schema for temporary storage (dummy implementation)
+const otpSchema = new Schema({
+  phone: { type: String, required: true },
+  otp: { type: String, required: true },
+  expiresAt: { type: Date, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -130,3 +139,4 @@ export const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
 export const Wishlist = mongoose.models.Wishlist || mongoose.model('Wishlist', wishlistSchema);
 export const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 export const ContactSubmission = mongoose.models.ContactSubmission || mongoose.model('ContactSubmission', contactSubmissionSchema);
+export const OTP = mongoose.models.OTP || mongoose.model('OTP', otpSchema);
