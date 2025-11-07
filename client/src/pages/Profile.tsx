@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -32,13 +32,20 @@ export default function Profile() {
     isDefault: false,
   });
 
-  const { data: user, isLoading: userLoading } = useQuery({
+  const { data: user, isLoading: userLoading, isError: userError, error: userFetchError } = useQuery({
     queryKey: ["/api/auth/me"],
   });
 
-  const { data: addresses, isLoading: addressesLoading } = useQuery({
+  const { data: addresses, isLoading: addressesLoading, isError: addressesError } = useQuery({
     queryKey: ["/api/addresses"],
+    enabled: !!user,
   });
+
+  useEffect(() => {
+    if (!userLoading && (userError || !user)) {
+      setLocation("/login");
+    }
+  }, [user, userLoading, userError, setLocation]);
 
   const createAddressMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/addresses", "POST", data),
@@ -129,8 +136,15 @@ export default function Profile() {
   }
 
   if (!user) {
-    setLocation("/login");
-    return null;
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+          <p className="mb-4">Redirecting to login...</p>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
@@ -326,6 +340,17 @@ export default function Profile() {
 
                 {addressesLoading ? (
                   <div className="text-center py-4">Loading addresses...</div>
+                ) : addressesError ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p className="text-red-500">Failed to load addresses. Please try again.</p>
+                    <Button 
+                      variant="outline" 
+                      className="mt-4"
+                      onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/addresses"] })}
+                    >
+                      Retry
+                    </Button>
+                  </div>
                 ) : (addresses as any)?.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <MapPin className="h-12 w-12 mx-auto mb-2 opacity-50" />

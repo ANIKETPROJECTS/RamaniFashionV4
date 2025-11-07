@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,9 +13,11 @@ import { format } from "date-fns";
 export default function Orders() {
   const [, setLocation] = useLocation();
 
-  const { data: orders, isLoading } = useQuery({
+  const { data: orders, isLoading, isError, error } = useQuery({
     queryKey: ["/api/orders"],
   });
+
+  const isUnauthorized = isError && error && String(error).includes("401:");
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -48,15 +51,32 @@ export default function Orders() {
     );
   }
 
-  if (!orders) {
+  if (isError || !orders) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <p className="mb-4">Please login to view your orders</p>
-          <Button onClick={() => setLocation("/login")} data-testid="button-login">
-            Login
-          </Button>
+          <p className="mb-4">
+            {isUnauthorized 
+              ? "Please login to view your orders" 
+              : isError 
+                ? "Failed to load orders. Please try again." 
+                : "Loading..."}
+          </p>
+          <div className="flex gap-2 justify-center">
+            {isUnauthorized ? (
+              <Button onClick={() => setLocation("/login")} data-testid="button-login">
+                Login
+              </Button>
+            ) : isError ? (
+              <Button 
+                onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/orders"] })}
+                data-testid="button-retry"
+              >
+                Retry
+              </Button>
+            ) : null}
+          </div>
         </div>
         <Footer />
       </div>

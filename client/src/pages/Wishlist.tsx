@@ -12,9 +12,11 @@ export default function Wishlist() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  const { data: wishlist, isLoading } = useQuery({
+  const { data: wishlist, isLoading, isError, error } = useQuery({
     queryKey: ["/api/wishlist"],
   });
+
+  const isUnauthorized = isError && error && String(error).includes("401:");
 
   const removeFromWishlistMutation = useMutation({
     mutationFn: (productId: string) => apiRequest(`/api/wishlist/${productId}`, "DELETE"),
@@ -51,15 +53,32 @@ export default function Wishlist() {
     );
   }
 
-  if (!wishlist) {
+  if (isError || !wishlist) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <p className="mb-4">Please login to view your wishlist</p>
-          <Button onClick={() => setLocation("/login")} data-testid="button-login">
-            Login
-          </Button>
+          <p className="mb-4">
+            {isUnauthorized 
+              ? "Please login to view your wishlist" 
+              : isError 
+                ? "Failed to load wishlist. Please try again." 
+                : "Loading..."}
+          </p>
+          <div className="flex gap-2 justify-center">
+            {isUnauthorized ? (
+              <Button onClick={() => setLocation("/login")} data-testid="button-login">
+                Login
+              </Button>
+            ) : isError ? (
+              <Button 
+                onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] })}
+                data-testid="button-retry"
+              >
+                Retry
+              </Button>
+            ) : null}
+          </div>
         </div>
         <Footer />
       </div>
