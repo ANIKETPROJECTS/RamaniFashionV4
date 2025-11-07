@@ -218,17 +218,19 @@ export default function Home() {
 
         <section className="py-12" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block" data-testid="text-section-new-arrivals-home">
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block mb-4" data-testid="text-section-new-arrivals-home">
                 New Arrival
               </h2>
-              <button
-                onClick={() => setLocation("/new-arrivals")}
-                className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                data-testid="button-view-all-new-arrivals"
-              >
-                View All
-              </button>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setLocation("/new-arrivals")}
+                  className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  data-testid="button-view-all-new-arrivals"
+                >
+                  View All
+                </button>
+              </div>
             </div>
             <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
               <div className="flex gap-4 pb-4">
@@ -263,17 +265,19 @@ export default function Home() {
 
         <section className="py-12" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block" data-testid="text-section-trending-collection">
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block mb-4" data-testid="text-section-trending-collection">
                 Trending Collection
               </h2>
-              <button
-                onClick={() => setLocation("/products?isTrending=true")}
-                className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                data-testid="button-view-all-trending"
-              >
-                View All
-              </button>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setLocation("/products?isTrending=true")}
+                  className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  data-testid="button-view-all-trending"
+                >
+                  View All
+                </button>
+              </div>
             </div>
             <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
               <div className="flex gap-4 pb-4">
@@ -314,9 +318,11 @@ export default function Home() {
         </section>
 
         <section className="max-w-7xl mx-auto px-4 py-12">
-          <h2 className="text-3xl font-bold font-serif text-center mb-12" data-testid="text-section-categories">
-            Shop by Category
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block" data-testid="text-section-categories">
+              Shop by Category
+            </h2>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {newCategories.map((category) => (
               <div key={category.name} className="flex flex-col items-center group cursor-pointer">
@@ -337,9 +343,11 @@ export default function Home() {
 
         <section className="py-16" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold font-serif text-center mb-12" data-testid="text-section-testimonials">
-              What Our Customers Say
-            </h2>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block" data-testid="text-section-testimonials">
+                What Our Customers Say
+              </h2>
+            </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
               <div className="lg:col-span-1 space-y-6">
