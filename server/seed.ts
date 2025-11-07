@@ -21,6 +21,7 @@ const sampleProducts = [
     stockQuantity: 15,
     isNew: true,
     isBestseller: false,
+    isTrending: true,
     rating: 4.7,
     reviewCount: 134,
     specifications: {
@@ -50,6 +51,7 @@ const sampleProducts = [
     stockQuantity: 22,
     isNew: true,
     isBestseller: false,
+    isTrending: true,
     rating: 4.8,
     reviewCount: 172,
     specifications: {
@@ -79,6 +81,7 @@ const sampleProducts = [
     stockQuantity: 18,
     isNew: true,
     isBestseller: false,
+    isTrending: true,
     rating: 4.4,
     reviewCount: 116,
     specifications: {
@@ -108,6 +111,7 @@ const sampleProducts = [
     stockQuantity: 12,
     isNew: true,
     isBestseller: false,
+    isTrending: true,
     rating: 4.7,
     reviewCount: 139,
     specifications: {
@@ -137,6 +141,7 @@ const sampleProducts = [
     stockQuantity: 20,
     isNew: true,
     isBestseller: false,
+    isTrending: true,
     rating: 4.6,
     reviewCount: 98,
     specifications: {
@@ -166,6 +171,7 @@ const sampleProducts = [
     stockQuantity: 25,
     isNew: true,
     isBestseller: false,
+    isTrending: true,
     rating: 4.8,
     reviewCount: 156,
     specifications: {

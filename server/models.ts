@@ -20,6 +20,7 @@ const productSchema = new Schema({
   stockQuantity: { type: Number, default: 0 },
   isNew: { type: Boolean, default: false },
   isBestseller: { type: Boolean, default: false },
+  isTrending: { type: Boolean, default: false },
   rating: { type: Number, default: 0 },
   reviewCount: { type: Number, default: 0 },
   specifications: {

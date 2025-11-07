@@ -24,7 +24,12 @@ export default function Home() {
     queryKey: ["/api/products?isNew=true&limit=6"],
   });
 
+  const { data: trendingData } = useQuery({
+    queryKey: ["/api/products?isTrending=true&limit=6"],
+  });
+
   const newArrivals = (newArrivalsData as any)?.products || [];
+  const trendingProducts = (trendingData as any)?.products || [];
 
   const categories = [
     { name: "Silk Sarees", image: bridalImage, itemCount: 156, category: "Silk Sarees" },
@@ -139,6 +144,39 @@ export default function Home() {
               alt="Ramani Fashion - Shop the authentic Silk Sarees, crafted with perfection by local artisans" 
               className="w-full h-auto object-cover"
             />
+          </div>
+        </section>
+
+        <section className="max-w-7xl mx-auto px-4 py-12">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold" data-testid="text-section-trending-collection">
+              Trending Collection
+            </h2>
+            <button
+              onClick={() => setLocation("/products?isTrending=true")}
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              data-testid="button-view-all-trending"
+            >
+              View All
+            </button>
+          </div>
+          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+            <div className="flex gap-4 pb-4">
+              {trendingProducts.slice(0, 6).map((product: any) => (
+                <NewArrivalCard
+                  key={product._id}
+                  id={product._id}
+                  name={product.name}
+                  image={product.images?.[0] || "/placeholder.jpg"}
+                  price={product.price}
+                  originalPrice={product.originalPrice}
+                  discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
+                  rating={product.rating}
+                  reviewCount={product.reviewCount}
+                  onClick={() => setLocation(`/product/${product._id}`)}
+                />
+              ))}
+            </div>
           </div>
         </section>
 
