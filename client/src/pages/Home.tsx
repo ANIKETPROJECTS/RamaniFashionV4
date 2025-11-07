@@ -216,14 +216,14 @@ export default function Home() {
       <main>
         <HeroCarousel />
 
-        <section className="bg-pink-50/30 py-12">
+        <section className="py-12" style={{ backgroundColor: 'rgba(252, 231, 243, 0.5)' }}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
-              <div className="relative">
+              <div className="relative pb-4">
                 <h2 className="text-3xl font-bold font-serif" data-testid="text-section-new-arrivals-home">
                   New Arrival
                 </h2>
-                <div className="absolute -bottom-2 left-0 w-24 h-1 bg-gradient-to-r from-pink-300 via-pink-200 to-transparent rounded-full"></div>
+                <div className="absolute bottom-0 left-0 w-40 h-1 rounded-full" style={{ background: 'linear-gradient(to right, #f9a8d4, #fbcfe8, transparent)' }}></div>
               </div>
               <button
                 onClick={() => setLocation("/new-arrivals")}
