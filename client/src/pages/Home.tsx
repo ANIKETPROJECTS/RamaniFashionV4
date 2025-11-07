@@ -218,13 +218,10 @@ export default function Home() {
 
         <section className="py-12" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <div className="relative pb-4">
-                <h2 className="text-3xl font-bold font-serif" data-testid="text-section-new-arrivals-home">
-                  New Arrival
-                </h2>
-                <div className="absolute bottom-0 left-0 right-0 w-full h-1" style={{ background: 'linear-gradient(to right, rgba(139, 92, 46, 0.3) 0%, rgba(139, 92, 46, 0.2) 40%, transparent 70%)' }}></div>
-              </div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold font-serif" data-testid="text-section-new-arrivals-home">
+                New Arrival
+              </h2>
               <button
                 onClick={() => setLocation("/new-arrivals")}
                 className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
@@ -264,35 +261,37 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 py-12">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold font-serif" data-testid="text-section-trending-collection">
-              Trending Collection
-            </h2>
-            <button
-              onClick={() => setLocation("/products?isTrending=true")}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-              data-testid="button-view-all-trending"
-            >
-              View All
-            </button>
-          </div>
-          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-            <div className="flex gap-4 pb-4">
-              {trendingProducts.slice(0, 6).map((product: any) => (
-                <NewArrivalCard
-                  key={product._id}
-                  id={product._id}
-                  name={product.name}
-                  image={product.images?.[0] || "/placeholder.jpg"}
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
-                  rating={product.rating}
-                  reviewCount={product.reviewCount}
-                  onClick={() => setLocation(`/product/${product._id}`)}
-                />
-              ))}
+        <section className="py-12" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold font-serif" data-testid="text-section-trending-collection">
+                Trending Collection
+              </h2>
+              <button
+                onClick={() => setLocation("/products?isTrending=true")}
+                className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                data-testid="button-view-all-trending"
+              >
+                View All
+              </button>
+            </div>
+            <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+              <div className="flex gap-4 pb-4">
+                {trendingProducts.slice(0, 6).map((product: any) => (
+                  <NewArrivalCard
+                    key={product._id}
+                    id={product._id}
+                    name={product.name}
+                    image={product.images?.[0] || "/placeholder.jpg"}
+                    price={product.price}
+                    originalPrice={product.originalPrice}
+                    discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
+                    rating={product.rating}
+                    reviewCount={product.reviewCount}
+                    onClick={() => setLocation(`/product/${product._id}`)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
