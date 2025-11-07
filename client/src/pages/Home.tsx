@@ -420,94 +420,13 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="contact" className="py-16 bg-gradient-to-b from-pink-50 to-white">
+        <section id="contact" className="py-12 bg-gradient-to-b from-pink-50 to-white">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8">
               <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">Get In Touch</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 We'd love to hear from you! Whether you have a question about our products, need assistance, or just want to share your feedback.
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12">
-              <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-contact-address">
-                <CardContent className="p-6 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-100 to-pink-200 rounded-full mb-4">
-                    <MapPin className="w-8 h-8 text-pink-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Address</h3>
-                  <p className="text-sm text-muted-foreground" data-testid="text-address">
-                    Shop No. 15, Ground Floor,<br />Kalpataru Complex,<br />Near City Mall, Nashik,<br />Maharashtra 422001
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-contact-phone">
-                <CardContent className="p-6 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full mb-4">
-                    <Phone className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Phone</h3>
-                  <a 
-                    href="tel:+915555555555" 
-                    className="text-purple-600 hover:underline text-sm block mb-2"
-                    data-testid="link-phone"
-                  >
-                    +91 5555555555
-                  </a>
-                  <div className="flex justify-center gap-3 mt-3">
-                    <a 
-                      href="https://instagram.com/ramanifashion" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-pink-600 hover:scale-110 transition-transform"
-                      data-testid="link-instagram"
-                      aria-label="Instagram"
-                    >
-                      <FaInstagram className="w-5 h-5" />
-                    </a>
-                    <a 
-                      href="https://wa.me/915555555555" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-green-600 hover:scale-110 transition-transform"
-                      data-testid="link-whatsapp"
-                      aria-label="WhatsApp"
-                    >
-                      <FaWhatsapp className="w-5 h-5" />
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-contact-email">
-                <CardContent className="p-6 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-100 to-purple-200 rounded-full mb-4">
-                    <Mail className="w-8 h-8 text-pink-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Email</h3>
-                  <a 
-                    href="mailto:info@ramanifashion.in" 
-                    className="text-pink-600 hover:underline text-sm"
-                    data-testid="link-email"
-                  >
-                    info@ramanifashion.in
-                  </a>
-                </CardContent>
-              </Card>
-
-              <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-store-hours">
-                <CardContent className="p-6 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-200 rounded-full mb-4">
-                    <Clock className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Store Hours</h3>
-                  <div className="text-sm text-muted-foreground">
-                    <p data-testid="text-hours-weekday">Mon-Sat: 10 AM - 9 PM</p>
-                    <p data-testid="text-hours-sunday">Sun: 11 AM - 8 PM</p>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -666,23 +585,106 @@ export default function Home() {
                 </CardContent>
               </Card>
 
-              <Card className="border-pink-200" data-testid="card-map">
-                <CardContent className="p-0">
-                  <div className="relative w-full h-full min-h-[600px] rounded-lg overflow-hidden">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3749.6774857769634!2d73.7875!3d19.9975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDU5JzUxLjAiTiA3M8KwNDcnMTUuMCJF!5e0!3m2!1sen!2sin!4v1234567890"
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Ramani Fashion Location"
-                      data-testid="iframe-map"
-                    ></iframe>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-6">
+                <Card className="border-pink-200" data-testid="card-map">
+                  <CardContent className="p-0">
+                    <div className="relative w-full h-[280px] rounded-lg overflow-hidden">
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3749.6774857769634!2d73.7875!3d19.9975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDU5JzUxLjAiTiA3M8KwNDcnMTUuMCJF!5e0!3m2!1sen!2sin!4v1234567890"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Ramani Fashion Location"
+                        data-testid="iframe-map"
+                      ></iframe>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-contact-address">
+                    <CardContent className="p-4 text-center">
+                      <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-pink-100 to-pink-200 rounded-full mb-2">
+                        <MapPin className="w-6 h-6 text-pink-600" />
+                      </div>
+                      <h3 className="text-sm font-semibold mb-1">Address</h3>
+                      <p className="text-xs text-muted-foreground" data-testid="text-address">
+                        Shop No. 15, Ground Floor,<br />Kalpataru Complex,<br />Near City Mall, Nashik,<br />Maharashtra 422001
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-contact-phone">
+                    <CardContent className="p-4 text-center">
+                      <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full mb-2">
+                        <Phone className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <h3 className="text-sm font-semibold mb-1">Phone</h3>
+                      <a 
+                        href="tel:+915555555555" 
+                        className="text-purple-600 hover:underline text-xs block mb-1"
+                        data-testid="link-phone"
+                      >
+                        +91 5555555555
+                      </a>
+                      <div className="flex justify-center gap-2">
+                        <a 
+                          href="https://instagram.com/ramanifashion" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-pink-600 hover:scale-110 transition-transform"
+                          data-testid="link-instagram"
+                          aria-label="Instagram"
+                        >
+                          <FaInstagram className="w-4 h-4" />
+                        </a>
+                        <a 
+                          href="https://wa.me/915555555555" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-green-600 hover:scale-110 transition-transform"
+                          data-testid="link-whatsapp"
+                          aria-label="WhatsApp"
+                        >
+                          <FaWhatsapp className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-contact-email">
+                    <CardContent className="p-4 text-center">
+                      <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-200 rounded-full mb-2">
+                        <Mail className="w-6 h-6 text-pink-600" />
+                      </div>
+                      <h3 className="text-sm font-semibold mb-1">Email</h3>
+                      <a 
+                        href="mailto:info@ramanifashion.in" 
+                        className="text-pink-600 hover:underline text-xs"
+                        data-testid="link-email"
+                      >
+                        info@ramanifashion.in
+                      </a>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-pink-200 hover:shadow-xl transition-shadow" data-testid="card-store-hours">
+                    <CardContent className="p-4 text-center">
+                      <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-200 rounded-full mb-2">
+                        <Clock className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <h3 className="text-sm font-semibold mb-1">Store Hours</h3>
+                      <div className="text-xs text-muted-foreground">
+                        <p data-testid="text-hours-weekday">Mon-Sat: 10 AM - 9 PM</p>
+                        <p data-testid="text-hours-sunday">Sun: 11 AM - 8 PM</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
           </div>
         </section>
