@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { localStorageService } from "@/lib/localStorage";
+import ProductCard from "@/components/ProductCard";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +27,18 @@ export default function ProductDetail() {
       if (!response.ok) throw new Error("Failed to fetch product");
       return response.json();
     },
+  });
+
+  const { data: similarProducts } = useQuery({
+    queryKey: ["/api/products", "similar", product?.category, id],
+    queryFn: async () => {
+      if (!product?.category) return [];
+      const response = await fetch(`/api/products?category=${encodeURIComponent(product.category)}&limit=4`);
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.products?.filter((p: any) => p._id !== id).slice(0, 4) || [];
+    },
+    enabled: !!product?.category,
   });
 
   const addToCartMutation = useMutation({
@@ -132,11 +145,11 @@ export default function ProductDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div>
-            <div className="mb-4 bg-card rounded-md overflow-hidden">
+            <div className="mb-4 bg-card rounded-md overflow-hidden max-w-md mx-auto">
               <img 
                 src={images[selectedImage]} 
                 alt={product.name}
-                className="w-full h-auto aspect-[3/4] object-cover"
+                className="w-full h-auto aspect-[2/3] object-cover"
                 data-testid="img-product-main"
               />
             </div>
@@ -336,43 +349,65 @@ export default function ProductDetail() {
         {product.specifications && (
           <Card className="mb-8">
             <CardHeader>
-              <h2 className="text-2xl font-bold">Specifications</h2>
+              <h2 className="text-2xl font-bold">Product Specifications</h2>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {product.specifications.fabricComposition && (
-                  <div>
-                    <span className="font-medium">Fabric Composition:</span>
-                    <span className="ml-2 text-muted-foreground">{product.specifications.fabricComposition}</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Fabric Composition</span>
+                    <span className="text-base font-medium">{product.specifications.fabricComposition}</span>
                   </div>
                 )}
                 {product.specifications.dimensions && (
-                  <div>
-                    <span className="font-medium">Dimensions:</span>
-                    <span className="ml-2 text-muted-foreground">{product.specifications.dimensions}</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Dimensions</span>
+                    <span className="text-base font-medium">{product.specifications.dimensions}</span>
                   </div>
                 )}
                 {product.specifications.weight && (
-                  <div>
-                    <span className="font-medium">Weight:</span>
-                    <span className="ml-2 text-muted-foreground">{product.specifications.weight}</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Weight</span>
+                    <span className="text-base font-medium">{product.specifications.weight}</span>
                   </div>
                 )}
                 {product.specifications.careInstructions && (
-                  <div>
-                    <span className="font-medium">Care Instructions:</span>
-                    <span className="ml-2 text-muted-foreground">{product.specifications.careInstructions}</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Care Instructions</span>
+                    <span className="text-base font-medium">{product.specifications.careInstructions}</span>
                   </div>
                 )}
                 {product.specifications.countryOfOrigin && (
-                  <div>
-                    <span className="font-medium">Country of Origin:</span>
-                    <span className="ml-2 text-muted-foreground">{product.specifications.countryOfOrigin}</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Country of Origin</span>
+                    <span className="text-base font-medium">{product.specifications.countryOfOrigin}</span>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {similarProducts && similarProducts.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Similar Products</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarProducts.map((similarProduct: any) => (
+                <ProductCard
+                  key={similarProduct._id}
+                  id={similarProduct._id}
+                  name={similarProduct.name}
+                  price={similarProduct.price}
+                  originalPrice={similarProduct.originalPrice}
+                  image={similarProduct.images?.[0] || "/api/placeholder/400/600"}
+                  rating={similarProduct.rating}
+                  reviewCount={similarProduct.reviewCount}
+                  isNew={similarProduct.isNew}
+                  isBestseller={similarProduct.isBestseller}
+                />
+              ))}
+            </div>
+          </div>
         )}
       </div>
 

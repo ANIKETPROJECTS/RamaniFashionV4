@@ -29,8 +29,51 @@ export default function AboutUs() {
   ];
 
   const fadeInUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 60 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
+  const fadeInLeft = {
+    hidden: { opacity: 0, x: -80 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        duration: 0.9,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
+  const fadeInRight = {
+    hidden: { opacity: 0, x: 80 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        duration: 0.9,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
   };
 
   const staggerContainer = {
@@ -38,7 +81,8 @@ export default function AboutUs() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15
+        staggerChildren: 0.2,
+        delayChildren: 0.1
       }
     }
   };
@@ -79,10 +123,10 @@ export default function AboutUs() {
         <section className="max-w-7xl mx-auto px-4 py-16">
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7 }}
+              variants={fadeInLeft}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
             >
               <h2 className="text-3xl font-bold mb-4">Our Story</h2>
               <p className="text-muted-foreground mb-4">
@@ -98,10 +142,10 @@ export default function AboutUs() {
             </motion.div>
             <motion.div 
               className="aspect-square rounded-lg overflow-hidden"
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7 }}
+              variants={fadeInRight}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
             >
               <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
                 <p className="text-6xl font-script text-primary">Ramani Fashion</p>
@@ -112,10 +156,10 @@ export default function AboutUs() {
           <div className="mb-16">
             <motion.h2 
               className="text-3xl font-bold text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6 }}
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
             >
               Why Choose Us
             </motion.h2>
@@ -124,16 +168,20 @@ export default function AboutUs() {
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
+              viewport={{ once: true, margin: "-60px" }}
             >
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
-                  <motion.div key={feature.title} variants={fadeInUp} transition={{ duration: 0.5 }}>
-                    <Card className="p-6 text-center h-full">
-                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                  <motion.div key={feature.title} variants={scaleIn}>
+                    <Card className="p-6 text-center h-full hover-elevate">
+                      <motion.div 
+                        className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4"
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
                         <Icon className="h-8 w-8 text-primary" />
-                      </div>
+                      </motion.div>
                       <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                       <p className="text-muted-foreground">{feature.description}</p>
                     </Card>

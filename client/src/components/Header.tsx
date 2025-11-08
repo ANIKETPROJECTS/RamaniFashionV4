@@ -33,7 +33,7 @@ interface HeaderProps {
 
 export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [user, setUser] = useState<any>(null);
   const [storageUpdateTrigger, setStorageUpdateTrigger] = useState(0);
 
@@ -129,6 +129,15 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
         contactSection.scrollIntoView({ behavior: "smooth" });
       }
     }, 100);
+  };
+
+  const handleHomeClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (location === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      setLocation("/");
+    }
   };
 
   return (
@@ -270,7 +279,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
           <NavigationMenu className="mx-auto">
             <NavigationMenuList className="flex items-center justify-center gap-8 py-2">
               <NavigationMenuItem>
-                <Link href="/" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-home">HOME</Link>
+                <a href="/" onClick={handleHomeClick} className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-home">HOME</a>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href="/new-arrivals" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-new-arrivals">NEW ARRIVALS</Link>
