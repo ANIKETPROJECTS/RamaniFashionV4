@@ -279,12 +279,28 @@ export default function ProductManagement() {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Silk Sarees">Silk Sarees</SelectItem>
-                          <SelectItem value="Cotton Sarees">Cotton Sarees</SelectItem>
-                          <SelectItem value="Designer Sarees">Designer Sarees</SelectItem>
-                          <SelectItem value="Bridal Sarees">Bridal Sarees</SelectItem>
+                          <SelectItem value="Ajrakh Modal">Ajrakh Modal</SelectItem>
+                          <SelectItem value="Banarasi">Banarasi</SelectItem>
+                          <SelectItem value="Chanderi">Chanderi</SelectItem>
+                          <SelectItem value="Jamdani Paithani">Jamdani Paithani</SelectItem>
+                          <SelectItem value="Kalamkari">Kalamkari</SelectItem>
+                          <SelectItem value="Kanjeevaram">Kanjeevaram</SelectItem>
+                          <SelectItem value="Katan">Katan</SelectItem>
+                          <SelectItem value="Khadi Cotton">Khadi Cotton</SelectItem>
+                          <SelectItem value="Khun / Irkal (Ilkal)">Khun / Irkal (Ilkal)</SelectItem>
+                          <SelectItem value="Kota Doria">Kota Doria</SelectItem>
+                          <SelectItem value="Mul Mul Cotton">Mul Mul Cotton</SelectItem>
+                          <SelectItem value="Patch Work">Patch Work</SelectItem>
+                          <SelectItem value="Pure Linen">Pure Linen</SelectItem>
+                          <SelectItem value="Tissue">Tissue</SelectItem>
+                          <SelectItem value="Contemporary">Contemporary</SelectItem>
+                          <SelectItem value="Bridal">Bridal</SelectItem>
                           <SelectItem value="Party Wear">Party Wear</SelectItem>
-                          <SelectItem value="Casual Wear">Casual Wear</SelectItem>
+                          <SelectItem value="Casual">Casual</SelectItem>
+                          <SelectItem value="Daily Wear">Daily Wear</SelectItem>
+                          <SelectItem value="Evening Wear">Evening Wear</SelectItem>
+                          <SelectItem value="Festival Wear">Festival Wear</SelectItem>
+                          <SelectItem value="Office Wear">Office Wear</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

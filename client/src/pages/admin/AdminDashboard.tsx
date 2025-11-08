@@ -77,7 +77,7 @@ export default function AdminDashboard() {
     ? analytics.recentActivity
     : [{ month: 'No data', sales: 0 }];
 
-  const COLORS = ['#ec4899', '#f472b6', '#fbcfe8', '#fce7f3', '#fdf2f8', '#fae8f3', '#f9e1f0'];
+  const COLORS = ['#ec4899', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#6366f1'];
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-pink-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -171,11 +171,11 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-pink-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-pink-50 dark:from-gray-800 dark:to-gray-750" data-testid="card-stat-users">
+                <Card className="border-purple-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-gray-750" data-testid="card-stat-users">
                   <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Customers</CardTitle>
-                    <div className="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                      <Users className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                    <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -189,11 +189,11 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-pink-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-pink-50 dark:from-gray-800 dark:to-gray-750" data-testid="card-stat-orders">
+                <Card className="border-cyan-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-cyan-50 dark:from-gray-800 dark:to-gray-750" data-testid="card-stat-orders">
                   <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Orders</CardTitle>
-                    <div className="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                      <ShoppingCart className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                    <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                      <ShoppingCart className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -239,8 +239,8 @@ export default function AdminDashboard() {
                       <AreaChart data={salesData}>
                         <defs>
                           <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#ec4899" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#ec4899" stopOpacity={0.1}/>
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -249,7 +249,7 @@ export default function AdminDashboard() {
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'white', 
-                            border: '1px solid #fce7f3',
+                            border: '1px solid #d1fae5',
                             borderRadius: '8px',
                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                           }} 
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
                         <Area 
                           type="monotone" 
                           dataKey="revenue" 
-                          stroke="#ec4899" 
+                          stroke="#10b981" 
                           strokeWidth={2}
                           fillOpacity={1} 
                           fill="url(#colorRevenue)" 
@@ -317,12 +317,12 @@ export default function AdminDashboard() {
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'white', 
-                            border: '1px solid #fce7f3',
+                            border: '1px solid #dbeafe',
                             borderRadius: '8px',
                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                           }} 
                         />
-                        <Bar dataKey="orders" fill="#ec4899" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="orders" fill="#3b82f6" radius={[8, 8, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -343,7 +343,7 @@ export default function AdminDashboard() {
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'white', 
-                            border: '1px solid #fce7f3',
+                            border: '1px solid #fed7aa',
                             borderRadius: '8px',
                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                           }} 
@@ -351,9 +351,9 @@ export default function AdminDashboard() {
                         <Line 
                           type="monotone" 
                           dataKey="sales" 
-                          stroke="#ec4899" 
+                          stroke="#f59e0b" 
                           strokeWidth={3}
-                          dot={{ fill: '#ec4899', r: 5 }}
+                          dot={{ fill: '#f59e0b', r: 5 }}
                           activeDot={{ r: 7 }}
                         />
                       </LineChart>

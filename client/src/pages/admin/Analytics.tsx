@@ -167,11 +167,11 @@ export default function Analytics() {
             <>
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <Card className="border-pink-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-pink-50 dark:from-gray-800 dark:to-gray-750">
+                <Card className="border-purple-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-gray-750">
                   <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Customers</CardTitle>
-                    <div className="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                      <Users className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                    <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -185,11 +185,11 @@ export default function Analytics() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-pink-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-pink-50 dark:from-gray-800 dark:to-gray-750">
+                <Card className="border-blue-100 dark:border-gray-700 hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-750">
                   <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Orders</CardTitle>
-                    <div className="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                      <ShoppingBag className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <ShoppingBag className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -235,8 +235,8 @@ export default function Analytics() {
                       <AreaChart data={customerGrowth}>
                         <defs>
                           <linearGradient id="colorCustomers" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#ec4899" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#ec4899" stopOpacity={0.1}/>
+                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -245,7 +245,7 @@ export default function Analytics() {
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'white', 
-                            border: '1px solid #fce7f3',
+                            border: '1px solid #e9d5ff',
                             borderRadius: '8px',
                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                           }} 
@@ -253,7 +253,7 @@ export default function Analytics() {
                         <Area 
                           type="monotone" 
                           dataKey="customers" 
-                          stroke="#ec4899" 
+                          stroke="#8b5cf6" 
                           strokeWidth={2}
                           fillOpacity={1} 
                           fill="url(#colorCustomers)" 
@@ -278,14 +278,14 @@ export default function Analytics() {
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'white', 
-                            border: '1px solid #fce7f3',
+                            border: '1px solid #e5e7eb',
                             borderRadius: '8px',
                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                           }} 
                         />
-                        <Bar dataKey="completed" fill="#ec4899" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="pending" fill="#f472b6" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="cancelled" fill="#fbcfe8" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="completed" fill="#10b981" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="pending" fill="#f59e0b" radius={[8, 8, 0, 0]} />
+                        <Bar dataKey="cancelled" fill="#ef4444" radius={[8, 8, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
