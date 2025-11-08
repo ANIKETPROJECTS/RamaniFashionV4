@@ -141,22 +141,20 @@ export default function ProductDetail() {
               />
             </div>
             
-            {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {images.map((img: string, idx: number) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`border-2 rounded-md overflow-hidden hover-elevate ${
-                      selectedImage === idx ? 'border-primary' : 'border-border'
-                    }`}
-                    data-testid={`button-thumbnail-${idx}`}
-                  >
-                    <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full aspect-square object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-4 gap-2">
+              {images.slice(0, 4).map((img: string, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImage(idx)}
+                  className={`border-2 rounded-md overflow-hidden hover-elevate ${
+                    selectedImage === idx ? 'border-primary' : 'border-border'
+                  }`}
+                  data-testid={`button-thumbnail-${idx}`}
+                >
+                  <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full aspect-square object-cover" />
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
@@ -278,28 +276,16 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <div className="flex flex-col gap-3 mb-8">
-              <div className="flex gap-3">
-                <Button
-                  className="flex-1"
-                  disabled={!product.inStock || addToCartMutation.isPending}
-                  onClick={() => addToCartMutation.mutate({ productId: product._id, quantity })}
-                  data-testid="button-add-to-cart"
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => addToWishlistMutation.mutate(product._id)}
-                  disabled={addToWishlistMutation.isPending}
-                  data-testid="button-add-to-wishlist"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-              </div>
+            <div className="flex gap-3 mb-8">
               <Button
-                className="w-full"
+                disabled={!product.inStock || addToCartMutation.isPending}
+                onClick={() => addToCartMutation.mutate({ productId: product._id, quantity })}
+                data-testid="button-add-to-cart"
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Add to Cart
+              </Button>
+              <Button
                 variant="default"
                 disabled={!product.inStock || buyNowMutation.isPending}
                 onClick={handleBuyNow}
@@ -307,6 +293,14 @@ export default function ProductDetail() {
               >
                 <Zap className="h-4 w-4 mr-2" />
                 Buy Now
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => addToWishlistMutation.mutate(product._id)}
+                disabled={addToWishlistMutation.isPending}
+                data-testid="button-add-to-wishlist"
+              >
+                <Heart className="h-4 w-4" />
               </Button>
             </div>
 
