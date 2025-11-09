@@ -23,7 +23,7 @@ export default function TrendingCollection() {
   const [sortBy, setSortBy] = useState("");
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
-  const [priceRange, setPriceRange] = useState([0, 0]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -134,7 +134,7 @@ export default function TrendingCollection() {
 
   // Update price range when API data changes
   useEffect(() => {
-    if (priceRangeData) {
+    if (priceRangeData && priceRangeData.maxPrice > 0) {
       setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
     }
   }, [priceRangeData]);
@@ -193,7 +193,7 @@ export default function TrendingCollection() {
     setSelectedColors([]);
     setSelectedOccasions([]);
     const minPrice = priceRangeData?.minPrice || 0;
-    const maxPrice = priceRangeData?.maxPrice || 0;
+    const maxPrice = priceRangeData?.maxPrice && priceRangeData.maxPrice > 0 ? priceRangeData.maxPrice : 10000;
     setPriceRange([minPrice, maxPrice]);
     setInStockOnly(false);
     setPage(1);
@@ -364,7 +364,7 @@ export default function TrendingCollection() {
                       setPage(1);
                     }}
                     min={priceRangeData?.minPrice || 0}
-                    max={priceRangeData?.maxPrice || 0}
+                    max={priceRangeData?.maxPrice && priceRangeData.maxPrice > 0 ? priceRangeData.maxPrice : 10000}
                     step={100}
                     data-testid="slider-price-range"
                   />
@@ -665,7 +665,7 @@ export default function TrendingCollection() {
                         setPage(1);
                       }}
                       min={priceRangeData?.minPrice || 0}
-                      max={priceRangeData?.maxPrice || 0}
+                      max={priceRangeData?.maxPrice && priceRangeData.maxPrice > 0 ? priceRangeData.maxPrice : 10000}
                       step={100}
                     />
                     <div className="flex items-center justify-between text-sm">

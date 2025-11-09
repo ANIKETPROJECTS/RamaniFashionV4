@@ -12,7 +12,7 @@ const occasions = ["Wedding", "Party", "Festival", "Casual", "Office"];
 const colors = ["Red", "Blue", "Green", "Pink", "Yellow", "Black", "White"];
 
 export default function FilterSidebar() {
-  const [priceRange, setPriceRange] = useState([0, 0]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [openSections, setOpenSections] = useState<string[]>(["categories", "price", "fabric"]);
 
   const toggleSection = (section: string) => {
