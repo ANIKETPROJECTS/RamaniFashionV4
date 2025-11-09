@@ -75,10 +75,12 @@ export default function ProductManagement() {
     countryOfOrigin: ""
   });
 
-  const { data: products, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<{products: any[], pagination: any}>({
     queryKey: ["/api/products"],
     enabled: !!adminToken
   });
+  
+  const products = data?.products || [];
 
   // Handle image file upload
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,9 +218,7 @@ export default function ProductManagement() {
   };
 
   const addProductMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("/api/admin/products", "POST", data, {
-      Authorization: `Bearer ${adminToken}`
-    }),
+    mutationFn: (data: any) => apiRequest("/api/admin/products", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Product added successfully!" });
@@ -231,9 +231,7 @@ export default function ProductManagement() {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: ({ id, data }: any) => apiRequest(`/api/admin/products/${id}`, "PATCH", data, {
-      Authorization: `Bearer ${adminToken}`
-    }),
+    mutationFn: ({ id, data }: any) => apiRequest(`/api/admin/products/${id}`, "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Product updated successfully!" });
@@ -246,9 +244,7 @@ export default function ProductManagement() {
   });
 
   const deleteProductMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/admin/products/${id}`, "DELETE", undefined, {
-      Authorization: `Bearer ${adminToken}`
-    }),
+    mutationFn: (id: string) => apiRequest(`/api/admin/products/${id}`, "DELETE"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Product deleted successfully!" });
