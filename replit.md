@@ -10,13 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**November 9, 2025 - Price Range Filter Bug Fix:**
-- Fixed critical filtering bug preventing products from appearing in New Arrivals, Trending, and Sale sections
-- Root cause: Default price range filter was set to ₹1000-₹10000, excluding products below ₹1000
-- Solution: Expanded default price range to ₹0-₹50,000 across all collection pages
-- Updated files: NewArrivals.tsx, TrendingCollection.tsx, Sale.tsx
-- Impact: Products of all price ranges now correctly appear in their respective showcase sections
-- Future enhancement recommended: Implement dynamic price range based on actual product data
+**November 9, 2025 - Dynamic Price Ranges & Automatic Sale Filtering:**
+- **Automatic Sale Detection:** Products with originalPrice > sellingPrice now automatically appear in sale section without manual isSale flag
+- **Dynamic Price Range Filters:** Price sliders now automatically adjust based on actual product prices in database and active filters
+- **New API Endpoint:** Added `/api/price-range` that calculates min/max prices based on filter context (isSale, isNew, isTrending, category, fabric, color, occasion, inStock)
+- **Backend Sale Filtering:** Modified `/api/products` to support `isSale=true` query parameter using MongoDB `$expr` for server-side sale detection
+- **Responsive Price Ranges:** Price sliders now update dynamically when filters change (removed `priceRangeInitialized` lock)
+- **Updated Files:** server/routes.ts, Sale.tsx, Products.tsx, NewArrivals.tsx, TrendingCollection.tsx
+- **Impact:** 
+  - Sale page automatically shows all discounted products (12 products)
+  - Price filters reflect actual database values (e.g., ₹100-₹6999 instead of hardcoded ₹0-₹50000)
+  - Filters are context-aware: selecting a category updates price range to match available products in that category
+- **Architecture:** Separate price range query with matching filter params ensures consistent filtering context across product and price range endpoints
 
 **November 8, 2025 - Product Management Form Enhancement:**
 - Added support for up to 5 product images (Main Image + 4 additional images)
