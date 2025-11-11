@@ -1207,11 +1207,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/orders", authenticateAdmin, async (req, res) => {
     try {
-      const orders = await Order.find()
-        .sort({ createdAt: -1 })
+      const {
+        search,
+        orderStatus,
+        paymentStatus,
+        startDate,
+        endDate,
+        sort = 'createdAt',
+        order = 'desc',
+        page = '1',
+        limit = '20'
+      } = req.query;
+
+      const query: any = {};
+
+      // Search by order number, customer name, email, or phone
+      if (search) {
+        const searchRegex = new RegExp(search as string, 'i');
+        
+        // Find users matching the search
+        const matchingUsers = await User.find({
+          $or: [
+            { name: searchRegex },
+            { email: searchRegex },
+            { phone: searchRegex }
+          ]
+        }).select('_id').lean();
+        
+        const userIds = matchingUsers.map(u => u._id);
+        
+        query.$or = [
+          { orderNumber: searchRegex },
+          { userId: { $in: userIds } }
+        ];
+      }
+
+      // Filter by order status
+      if (orderStatus) {
+        const statuses = (orderStatus as string).split(',').filter(Boolean);
+        query.orderStatus = statuses.length > 1 ? { $in: statuses } : statuses[0];
+      }
+
+      // Filter by payment status
+      if (paymentStatus) {
+        const statuses = (paymentStatus as string).split(',').filter(Boolean);
+        query.paymentStatus = statuses.length > 1 ? { $in: statuses } : statuses[0];
+      }
+
+      // Filter by date range
+      if (startDate || endDate) {
+        query.createdAt = {};
+        if (startDate) query.createdAt.$gte = new Date(startDate as string);
+        if (endDate) {
+          const endDateTime = new Date(endDate as string);
+          endDateTime.setHours(23, 59, 59, 999);
+          query.createdAt.$lte = endDateTime;
+        }
+      }
+
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
+      const skip = (pageNum - 1) * limitNum;
+
+      const sortOrder = order === 'asc' ? 1 : -1;
+      const sortObj: any = {};
+      sortObj[sort as string] = sortOrder;
+
+      const orders = await Order.find(query)
+        .sort(sortObj)
+        .skip(skip)
+        .limit(limitNum)
         .populate('userId', 'name email phone')
         .lean();
-      res.json(orders);
+
+      const total = await Order.countDocuments(query);
+
+      res.json({
+        orders,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          pages: Math.ceil(total / limitNum)
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/orders/:id", authenticateAdmin, async (req, res) => {
+    try {
+      const order = await Order.findById(req.params.id)
+        .populate('userId', 'name email phone')
+        .populate('items.productId', 'name images')
+        .lean();
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+      res.json(order);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -1219,12 +1313,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/admin/orders/:id/status", authenticateAdmin, async (req, res) => {
     try {
-      const { status } = req.body;
+      const { orderStatus, paymentStatus } = req.body;
+      const updateData: any = { updatedAt: new Date() };
+      
+      if (orderStatus) updateData.orderStatus = orderStatus;
+      if (paymentStatus) updateData.paymentStatus = paymentStatus;
+
       const order = await Order.findByIdAndUpdate(
         req.params.id,
-        { status, updatedAt: new Date() },
+        updateData,
         { new: true }
-      );
+      ).populate('userId', 'name email phone');
+      
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
       }
