@@ -232,28 +232,26 @@ export default function Login() {
                 <div>
                   <Label>Mobile Number</Label>
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 bg-secondary px-3 py-2 rounded-full border border-border">
-                        <span className="text-2xl">🇮🇳</span>
-                        <span className="font-semibold text-sm">+91</span>
-                      </div>
-                      <div className="flex gap-1 flex-1">
-                        {phoneDigits.map((digit, index) => (
-                          <input
-                            key={index}
-                            ref={(el) => (phoneInputRefs.current[index] = el)}
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={1}
-                            value={digit}
-                            onChange={(e) => handlePhoneDigitChange(index, e.target.value)}
-                            onKeyDown={(e) => handlePhoneKeyDown(index, e)}
-                            disabled={otpVerified}
-                            className="w-9 h-11 text-center text-lg font-semibold border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-                            data-testid={`input-phone-${index}`}
-                          />
-                        ))}
-                      </div>
+                    <div className="flex items-center justify-center gap-2 bg-secondary/50 px-3 py-2 rounded-lg w-fit mx-auto">
+                      <span className="text-2xl">🇮🇳</span>
+                      <span className="font-semibold text-sm">+91</span>
+                    </div>
+                    <div className="flex justify-center gap-1.5">
+                      {phoneDigits.map((digit, index) => (
+                        <input
+                          key={index}
+                          ref={(el) => (phoneInputRefs.current[index] = el)}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handlePhoneDigitChange(index, e.target.value)}
+                          onKeyDown={(e) => handlePhoneKeyDown(index, e)}
+                          disabled={otpVerified}
+                          className="w-10 h-12 text-center text-lg font-semibold border-2 border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                          data-testid={`input-phone-${index}`}
+                        />
+                      ))}
                     </div>
                     {!otpVerified && (
                       <Button
