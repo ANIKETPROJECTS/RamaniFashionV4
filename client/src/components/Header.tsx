@@ -371,19 +371,19 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 >
                   CATEGORIES
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-white shadow-lg overflow-visible">
-                  <div className="w-[98vw] max-w-[1400px] p-8 overflow-visible">
-                    <div className="flex gap-5 justify-center overflow-x-auto pb-8 px-6">
+                <NavigationMenuContent className="bg-transparent shadow-none border-0">
+                  <div className="w-screen max-w-none px-12 py-6">
+                    <div className="flex gap-6 justify-center items-start max-w-[min(1440px,calc(100vw-4rem))] mx-auto">
                       <Link
                         href="/products?category=Jamdani Paithani"
-                        className="group flex flex-col items-center flex-shrink-0 transition-transform duration-300 hover:scale-110"
+                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
                         data-testid="category-jamdani-paithani"
                       >
-                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
+                        <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
                           <img
                             src={paithaniImage}
                             alt="Jamdani Paithani"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="mt-3 text-center">
@@ -395,14 +395,14 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Khun Irkal"
-                        className="group flex flex-col items-center flex-shrink-0 transition-transform duration-300 hover:scale-110"
+                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
                         data-testid="category-khun-irkal"
                       >
-                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
+                        <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
                           <img
                             src={khunIrkalImage}
                             alt="Khun / Irkal (Ilkal)"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="mt-3 text-center">
@@ -414,14 +414,14 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Ajrakh Modal"
-                        className="group flex flex-col items-center flex-shrink-0 transition-transform duration-300 hover:scale-110"
+                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
                         data-testid="category-ajrakh-modal"
                       >
-                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
+                        <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
                           <img
                             src={ajrakhModalImage}
                             alt="Ajrakh Modal"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="mt-3 text-center">
@@ -433,14 +433,14 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Mul Mul Cotton"
-                        className="group flex flex-col items-center flex-shrink-0 transition-transform duration-300 hover:scale-110"
+                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
                         data-testid="category-mul-mul-cotton"
                       >
-                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
+                        <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
                           <img
                             src={mulCottonImage}
                             alt="Mul Mul Cotton"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="mt-3 text-center">
@@ -452,14 +452,14 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Khadi Cotton"
-                        className="group flex flex-col items-center flex-shrink-0 transition-transform duration-300 hover:scale-110"
+                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
                         data-testid="category-khadi-cotton"
                       >
-                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
+                        <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
                           <img
                             src={khadiCottonImage}
                             alt="Khadi Cotton"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="mt-3 text-center">
@@ -471,14 +471,14 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Patch Work"
-                        className="group flex flex-col items-center flex-shrink-0 transition-transform duration-300 hover:scale-110"
+                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
                         data-testid="category-patch-work"
                       >
-                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
+                        <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
                           <img
                             src={patchWorkImage}
                             alt="Patch Work"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="mt-3 text-center">
@@ -490,14 +490,14 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Pure Linen"
-                        className="group flex flex-col items-center flex-shrink-0 transition-transform duration-300 hover:scale-110"
+                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
                         data-testid="category-pure-linen"
                       >
-                        <div className="relative w-32 md:w-40 aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
+                        <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
                           <img
                             src={pureLinenImage}
                             alt="Pure Linen"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                         <div className="mt-3 text-center">
