@@ -36,6 +36,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import logoImage from "@assets/PNG__B_ LOGO_1762442171742.png";
+import jamdaniImage from "@assets/stock_images/indian_woman_wearing_f25adcb7.jpg";
+import khunIrkalImage from "@assets/stock_images/indian_woman_wearing_65410991.jpg";
+import ajrakhModalImage from "@assets/stock_images/indian_woman_wearing_cf45c7a5.jpg";
+import mulMulCottonImage from "@assets/stock_images/indian_woman_wearing_f3665464.jpg";
+import khadiCottonImage from "@assets/stock_images/indian_woman_wearing_fa0df517.jpg";
+import patchWorkImage from "@assets/stock_images/indian_woman_wearing_f978c32c.jpg";
+import pureLinenImage from "@assets/stock_images/indian_woman_wearing_34d613a8.jpg";
+import silkImage from "@assets/stock_images/indian_woman_wearing_6bfefd32.jpg";
 
 interface HeaderProps {
   cartCount?: number;
@@ -364,73 +372,166 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 >
                   CATEGORIES
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-white">
-                  <div className="w-[250px] p-3">
-                    <ul className="grid gap-2">
-                      <li>
-                        <Link
-                          href="/products?category=Jamdani Paithani"
-                          className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
-                          data-testid="category-jamdani-paithani"
-                        >
-                          <div className="text-sm font-medium leading-none text-black">Jamdani Paithani</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/products?category=Khun Irkal"
-                          className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
-                          data-testid="category-khun-irkal"
-                        >
-                          <div className="text-sm font-medium leading-none text-black">Khun / Irkal (Ilkal)</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/products?category=Ajrakh Modal"
-                          className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
-                          data-testid="category-ajrakh-modal"
-                        >
-                          <div className="text-sm font-medium leading-none text-black">Ajrakh Modal</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/products?category=Mul Mul Cotton"
-                          className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
-                          data-testid="category-mul-mul-cotton"
-                        >
-                          <div className="text-sm font-medium leading-none text-black">Mul Mul Cotton</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/products?category=Khadi Cotton"
-                          className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
-                          data-testid="category-khadi-cotton"
-                        >
-                          <div className="text-sm font-medium leading-none text-black">Khadi Cotton</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/products?category=Patch Work"
-                          className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
-                          data-testid="category-patch-work"
-                        >
-                          <div className="text-sm font-medium leading-none text-black">Patch Work</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/products?category=Pure Linen"
-                          className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
-                          data-testid="category-pure-linen"
-                        >
-                          <div className="text-sm font-medium leading-none text-black">Pure Linen</div>
-                        </Link>
-                      </li>
-                    </ul>
+                <NavigationMenuContent className="bg-white shadow-lg">
+                  <div className="w-[900px] max-w-6xl p-6">
+                    <div className="text-center mb-6">
+                      <h3 className="text-lg font-semibold text-white bg-pink-500 inline-block px-8 py-2 rounded-full">
+                        Shop by Category
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-4 gap-6">
+                      <Link
+                        href="/products?category=Jamdani Paithani"
+                        className="group flex flex-col items-center"
+                        data-testid="category-jamdani-paithani"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={jamdaniImage}
+                            alt="Jamdani Paithani"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Jamdani Paithani
+                          </span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/products?category=Khun Irkal"
+                        className="group flex flex-col items-center"
+                        data-testid="category-khun-irkal"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={khunIrkalImage}
+                            alt="Khun / Irkal (Ilkal)"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Khun / Irkal (Ilkal)
+                          </span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/products?category=Ajrakh Modal"
+                        className="group flex flex-col items-center"
+                        data-testid="category-ajrakh-modal"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={ajrakhModalImage}
+                            alt="Ajrakh Modal"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Ajrakh Modal
+                          </span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/products?category=Mul Mul Cotton"
+                        className="group flex flex-col items-center"
+                        data-testid="category-mul-mul-cotton"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={mulMulCottonImage}
+                            alt="Mul Mul Cotton"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Mul Mul Cotton
+                          </span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/products?category=Khadi Cotton"
+                        className="group flex flex-col items-center"
+                        data-testid="category-khadi-cotton"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={khadiCottonImage}
+                            alt="Khadi Cotton"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Khadi Cotton
+                          </span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/products?category=Patch Work"
+                        className="group flex flex-col items-center"
+                        data-testid="category-patch-work"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={patchWorkImage}
+                            alt="Patch Work"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Patch Work
+                          </span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/products?category=Pure Linen"
+                        className="group flex flex-col items-center"
+                        data-testid="category-pure-linen"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={pureLinenImage}
+                            alt="Pure Linen"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Pure Linen
+                          </span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/products?category=Silk"
+                        className="group flex flex-col items-center"
+                        data-testid="category-silk"
+                      >
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-transparent hover:border-pink-500 transition-all">
+                          <img
+                            src={silkImage}
+                            alt="Silk"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <span className="text-sm font-semibold text-white bg-pink-500 px-4 py-1.5 rounded-full inline-block">
+                            Silk
+                          </span>
+                        </div>
+                      </Link>
+                    </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
