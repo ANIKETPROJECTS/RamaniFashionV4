@@ -372,11 +372,11 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                   CATEGORIES
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-transparent shadow-none border-0">
-                  <div className="w-screen max-w-none px-12 py-6">
-                    <div className="flex gap-6 justify-center items-start max-w-[min(1440px,calc(100vw-4rem))] mx-auto">
+                  <div className="w-full px-6 md:px-12 py-6">
+                    <div className="flex gap-3 md:gap-4 lg:gap-6 justify-center items-start flex-wrap max-w-7xl mx-auto">
                       <Link
                         href="/products?category=Jamdani Paithani"
-                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
+                        className="group flex flex-col items-center flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40"
                         data-testid="category-jamdani-paithani"
                       >
                         <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
@@ -386,8 +386,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
+                        <div className="mt-2 md:mt-3 text-center">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-white bg-pink-500 px-2 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full inline-block whitespace-nowrap">
                             Jamdani Paithani
                           </span>
                         </div>
@@ -395,7 +395,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Khun Irkal"
-                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
+                        className="group flex flex-col items-center flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40"
                         data-testid="category-khun-irkal"
                       >
                         <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
@@ -405,8 +405,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
+                        <div className="mt-2 md:mt-3 text-center">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-white bg-pink-500 px-2 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full inline-block whitespace-nowrap">
                             Khun / Irkal (Ilkal)
                           </span>
                         </div>
@@ -414,7 +414,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Ajrakh Modal"
-                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
+                        className="group flex flex-col items-center flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40"
                         data-testid="category-ajrakh-modal"
                       >
                         <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
@@ -424,8 +424,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
+                        <div className="mt-2 md:mt-3 text-center">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-white bg-pink-500 px-2 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full inline-block whitespace-nowrap">
                             Ajrakh Modal
                           </span>
                         </div>
@@ -433,7 +433,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Mul Mul Cotton"
-                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
+                        className="group flex flex-col items-center flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40"
                         data-testid="category-mul-mul-cotton"
                       >
                         <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
@@ -443,8 +443,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
+                        <div className="mt-2 md:mt-3 text-center">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-white bg-pink-500 px-2 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full inline-block whitespace-nowrap">
                             Mul Mul Cotton
                           </span>
                         </div>
@@ -452,7 +452,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Khadi Cotton"
-                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
+                        className="group flex flex-col items-center flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40"
                         data-testid="category-khadi-cotton"
                       >
                         <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
@@ -462,8 +462,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
+                        <div className="mt-2 md:mt-3 text-center">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-white bg-pink-500 px-2 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full inline-block whitespace-nowrap">
                             Khadi Cotton
                           </span>
                         </div>
@@ -471,7 +471,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Patch Work"
-                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
+                        className="group flex flex-col items-center flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40"
                         data-testid="category-patch-work"
                       >
                         <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
@@ -481,8 +481,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
+                        <div className="mt-2 md:mt-3 text-center">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-white bg-pink-500 px-2 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full inline-block whitespace-nowrap">
                             Patch Work
                           </span>
                         </div>
@@ -490,7 +490,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
                       <Link
                         href="/products?category=Pure Linen"
-                        className="group flex flex-col items-center flex-shrink-0 w-36 md:w-40"
+                        className="group flex flex-col items-center flex-shrink-0 w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40"
                         data-testid="category-pure-linen"
                       >
                         <div className="relative w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent group-hover:border-pink-500 transition-all duration-300 shadow-md group-hover:shadow-xl">
@@ -500,8 +500,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
-                        <div className="mt-3 text-center">
-                          <span className="text-xs md:text-sm font-semibold text-white bg-pink-500 px-3 md:px-4 py-1.5 rounded-full inline-block whitespace-nowrap">
+                        <div className="mt-2 md:mt-3 text-center">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold text-white bg-pink-500 px-2 sm:px-3 md:px-4 py-1 md:py-1.5 rounded-full inline-block whitespace-nowrap">
                             Pure Linen
                           </span>
                         </div>
