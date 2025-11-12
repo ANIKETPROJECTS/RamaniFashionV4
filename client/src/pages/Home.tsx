@@ -79,12 +79,8 @@ export default function Home() {
     queryKey: ["/api/products?isTrending=true&limit=6"],
   });
 
-  const newArrivals = ((newArrivalsData as any)?.products || []).filter(
-    (product: any) => product.images && product.images.length > 0
-  );
-  const trendingProducts = ((trendingData as any)?.products || []).filter(
-    (product: any) => product.images && product.images.length > 0
-  );
+  const newArrivals = (newArrivalsData as any)?.products || [];
+  const trendingProducts = (trendingData as any)?.products || [];
 
   const contactForm = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -350,7 +346,7 @@ export default function Home() {
                     <NewArrivalCard
                       id={product._id}
                       name={product.name}
-                      image={product.images?.[0] || "/placeholder.jpg"}
+                      image={product.images?.[0]}
                       price={product.price}
                       originalPrice={product.originalPrice}
                       discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
@@ -436,7 +432,7 @@ export default function Home() {
                     <NewArrivalCard
                       id={product._id}
                       name={product.name}
-                      image={product.images?.[0] || "/placeholder.jpg"}
+                      image={product.images?.[0]}
                       price={product.price}
                       originalPrice={product.originalPrice}
                       discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
