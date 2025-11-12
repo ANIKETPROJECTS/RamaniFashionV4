@@ -68,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         order = 'desc',
         page = '1',
         limit = '12',
-        isSale
+        onSale
       } = req.query;
 
       const query: any = {};
@@ -96,10 +96,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.query.isBestseller === 'true') query.isBestseller = true;
       if (req.query.isTrending === 'true') query.isTrending = true;
       
-      // Filter for sale products (where originalPrice > price)
-      if (isSale === 'true') {
-        query.originalPrice = { $exists: true, $ne: null };
-        query.$expr = { $gt: ['$originalPrice', '$price'] };
+      // Filter for sale products
+      if (onSale === 'true') {
+        query.onSale = true;
       }
       
       if (minPrice || maxPrice) {
@@ -673,7 +672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         occasion,
         inStock,
         search,
-        isSale
+        onSale
       } = req.query;
 
       const query: any = {};
@@ -701,10 +700,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.query.isBestseller === 'true') query.isBestseller = true;
       if (req.query.isTrending === 'true') query.isTrending = true;
       
-      // Filter for sale products (where originalPrice > price)
-      if (isSale === 'true') {
-        query.originalPrice = { $exists: true, $ne: null };
-        query.$expr = { $gt: ['$originalPrice', '$price'] };
+      // Filter for sale products
+      if (onSale === 'true') {
+        query.onSale = true;
       }
       
       if (search) {

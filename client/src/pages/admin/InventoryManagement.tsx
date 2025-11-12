@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import AdminLayout from "@/components/AdminLayout";
@@ -6,7 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
@@ -24,39 +27,176 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Search, Edit } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Search, Pencil, Trash2, Upload, X, Link as LinkIcon } from "lucide-react";
 
 export default function InventoryManagement() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const adminToken = localStorage.getItem("adminToken");
 
-  // Search, sort, and filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("stock");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterStockStatus, setFilterStockStatus] = useState("all");
 
-  // Edit dialog state
   const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [editStock, setEditStock] = useState("");
-  const [editInStock, setEditInStock] = useState(true);
+  const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  
+  const [productForm, setProductForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    originalPrice: "",
+    category: "",
+    subcategory: "",
+    fabric: "",
+    color: "",
+    occasion: "",
+    pattern: "",
+    workType: "",
+    blousePiece: false,
+    sareeLength: "",
+    stockQuantity: "",
+    inStock: true,
+    isNew: false,
+    isTrending: false,
+    isBestseller: false,
+    onSale: false,
+    fabricComposition: "",
+    dimensions: "",
+    weight: "",
+    careInstructions: "",
+    countryOfOrigin: ""
+  });
 
-  const { data: inventory, isLoading } = useQuery({
+  const { data: inventory, isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/inventory"],
     enabled: !!adminToken
   });
 
-  const updateInventoryMutation = useMutation({
-    mutationFn: ({ id, stockQuantity, inStock }: any) => 
-      apiRequest(`/api/admin/inventory/${id}`, "PATCH", { stockQuantity, inStock }, {
-        Authorization: `Bearer ${adminToken}`
-      }),
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (uploadedImages.length + files.length > 5) {
+      toast({ 
+        title: "Too many images", 
+        description: "Maximum 5 images allowed per product",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    
+    for (let i = 0; i < files.length; i++) {
+      formData.append('images', files[i]);
+    }
+
+    try {
+      const response = await fetch('/api/admin/upload-images', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      setUploadedImages([...uploadedImages, ...data.urls]);
+      toast({ title: "Images uploaded successfully!" });
+      
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      toast({ 
+        title: "Upload failed", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(uploadedImages.filter((_, i) => i !== index));
+  };
+
+  const handleAddImageUrl = () => {
+    if (!imageUrl.trim()) {
+      toast({ 
+        title: "URL required", 
+        description: "Please enter a valid image URL",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    if (uploadedImages.length >= 5) {
+      toast({ 
+        title: "Too many images", 
+        description: "Maximum 5 images allowed per product",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    try {
+      new URL(imageUrl);
+      setUploadedImages([...uploadedImages, imageUrl]);
+      setImageUrl("");
+      toast({ title: "Image URL added successfully!" });
+    } catch (error) {
+      toast({ 
+        title: "Invalid URL", 
+        description: "Please enter a valid image URL",
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const updateProductMutation = useMutation({
+    mutationFn: ({ id, data }: any) => apiRequest(`/api/admin/products/${id}`, "PATCH", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/inventory"] });
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
-      toast({ title: "Inventory updated successfully!" });
+      toast({ title: "Product updated successfully!" });
       setEditingProduct(null);
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/admin/products/${id}`, "DELETE"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      toast({ title: "Product deleted successfully!" });
+      setDeleteProductId(null);
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -65,28 +205,77 @@ export default function InventoryManagement() {
 
   const handleEdit = (product: any) => {
     setEditingProduct(product);
-    setEditStock(product.stockQuantity?.toString() || "0");
-    setEditInStock(product.inStock !== false);
-  };
-
-  const handleUpdateStock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingProduct) return;
-
-    updateInventoryMutation.mutate({ 
-      id: editingProduct._id, 
-      stockQuantity: parseInt(editStock) || 0,
-      inStock: editInStock
+    const images = product.images || [];
+    setUploadedImages(images);
+    setProductForm({
+      name: product.name || "",
+      description: product.description || "",
+      price: product.price?.toString() || "",
+      originalPrice: product.originalPrice?.toString() || "",
+      category: product.category || "",
+      subcategory: product.subcategory || "",
+      fabric: product.fabric || "",
+      color: product.color || "",
+      occasion: product.occasion || "",
+      pattern: product.pattern || "",
+      workType: product.workType || "",
+      blousePiece: product.blousePiece || false,
+      sareeLength: product.sareeLength || "",
+      stockQuantity: product.stockQuantity?.toString() || "",
+      inStock: product.inStock !== false,
+      isNew: product.isNew || false,
+      isTrending: product.isTrending || false,
+      isBestseller: product.isBestseller || false,
+      onSale: product.onSale || false,
+      fabricComposition: product.specifications?.fabricComposition || "",
+      dimensions: product.specifications?.dimensions || "",
+      weight: product.specifications?.weight || "",
+      careInstructions: product.specifications?.careInstructions || "",
+      countryOfOrigin: product.specifications?.countryOfOrigin || ""
     });
   };
 
-  // Filtered and sorted inventory
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const formattedData = {
+      name: productForm.name,
+      description: productForm.description,
+      price: parseFloat(productForm.price),
+      originalPrice: productForm.originalPrice ? parseFloat(productForm.originalPrice) : undefined,
+      category: productForm.category,
+      subcategory: productForm.subcategory || undefined,
+      fabric: productForm.fabric || undefined,
+      color: productForm.color || undefined,
+      occasion: productForm.occasion || undefined,
+      pattern: productForm.pattern || undefined,
+      workType: productForm.workType || undefined,
+      blousePiece: productForm.blousePiece,
+      sareeLength: productForm.sareeLength || undefined,
+      stockQuantity: parseInt(productForm.stockQuantity) || 0,
+      inStock: productForm.inStock,
+      isNew: productForm.isNew,
+      isTrending: productForm.isTrending,
+      isBestseller: productForm.isBestseller,
+      onSale: productForm.onSale,
+      images: uploadedImages,
+      specifications: {
+        fabricComposition: productForm.fabricComposition || undefined,
+        dimensions: productForm.dimensions || undefined,
+        weight: productForm.weight || undefined,
+        careInstructions: productForm.careInstructions || undefined,
+        countryOfOrigin: productForm.countryOfOrigin || undefined,
+      }
+    };
+
+    updateProductMutation.mutate({ id: editingProduct._id, data: formattedData });
+  };
+
   const filteredInventory = useMemo(() => {
     if (!inventory) return [];
 
     let filtered = [...inventory];
 
-    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter((p: any) => 
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -94,12 +283,10 @@ export default function InventoryManagement() {
       );
     }
 
-    // Apply category filter
     if (filterCategory !== "all") {
       filtered = filtered.filter((p: any) => p.category === filterCategory);
     }
 
-    // Apply stock status filter
     if (filterStockStatus === "inStock") {
       filtered = filtered.filter((p: any) => p.inStock === true && (p.stockQuantity || 0) > 0);
     } else if (filterStockStatus === "lowStock") {
@@ -108,7 +295,6 @@ export default function InventoryManagement() {
       filtered = filtered.filter((p: any) => !p.inStock || (p.stockQuantity || 0) === 0);
     }
 
-    // Apply sorting
     filtered.sort((a: any, b: any) => {
       switch (sortBy) {
         case "name":
@@ -129,14 +315,12 @@ export default function InventoryManagement() {
     return filtered;
   }, [inventory, searchQuery, filterCategory, filterStockStatus, sortBy]);
 
-  // Get unique categories
   const categories = useMemo(() => {
     if (!inventory) return [];
     const cats = new Set(inventory.map((p: any) => p.category).filter(Boolean));
     return Array.from(cats);
   }, [inventory]);
 
-  // Calculate statistics
   const totalProducts = inventory?.length || 0;
   const lowStockProducts = inventory?.filter((p: any) => (p.stockQuantity || 0) < 10 && (p.stockQuantity || 0) > 0 && p.inStock) || [];
   const outOfStockProducts = inventory?.filter((p: any) => !p.inStock || (p.stockQuantity || 0) === 0) || [];
@@ -158,7 +342,6 @@ export default function InventoryManagement() {
         </p>
       </div>
 
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
           <CardHeader className="pb-2">
@@ -200,7 +383,6 @@ export default function InventoryManagement() {
         </Card>
       </div>
 
-      {/* Search, Sort, and Filter Controls */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle data-testid="text-search-filter-title">Search & Filter</CardTitle>
@@ -308,7 +490,6 @@ export default function InventoryManagement() {
         </CardContent>
       </Card>
 
-      {/* Inventory Table */}
       <Card>
         <CardHeader>
           <CardTitle data-testid="text-inventory-title">
@@ -371,78 +552,382 @@ export default function InventoryManagement() {
                           </span>
                         </TableCell>
                         <TableCell data-testid={`cell-actions-${product._id}`}>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEdit(product)}
-                                data-testid={`button-edit-${product._id}`}
-                              >
-                                <Edit className="mr-2 h-4 w-4" />
-                                Update Stock
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle data-testid="text-edit-dialog-title">Update Stock</DialogTitle>
-                              </DialogHeader>
-                              <form onSubmit={handleUpdateStock} className="space-y-4">
-                                <div className="space-y-2">
-                                  <Label data-testid="label-product-name-display">Product</Label>
-                                  <div className="font-medium" data-testid="text-product-name-display">
-                                    {editingProduct?.name}
+                          <div className="flex gap-2 flex-wrap">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEdit(product)}
+                                  data-testid={`button-edit-${product._id}`}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-3xl max-h-screen overflow-y-auto">
+                                <DialogHeader>
+                                  <DialogTitle data-testid="text-edit-dialog-title">Edit Product</DialogTitle>
+                                </DialogHeader>
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                  <div className="space-y-2">
+                                    <Label data-testid="label-edit-product-images">Product Images (Max 5)</Label>
+                                    <div className="flex gap-2 flex-wrap">
+                                      {uploadedImages.map((url, index) => (
+                                        <div key={index} className="relative group">
+                                          <img 
+                                            src={url} 
+                                            alt={`Product ${index + 1}`}
+                                            className="w-20 h-20 object-cover rounded-md"
+                                            data-testid={`img-edit-uploaded-${index}`}
+                                          />
+                                          <Button
+                                            type="button"
+                                            size="icon"
+                                            variant="destructive"
+                                            className="absolute -top-2 -right-2 h-6 w-6 opacity-0 group-hover:opacity-100"
+                                            onClick={() => removeImage(index)}
+                                            data-testid={`button-edit-remove-image-${index}`}
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    {uploadedImages.length < 5 && (
+                                      <Tabs defaultValue="device" className="w-full">
+                                        <TabsList className="grid w-full grid-cols-2">
+                                          <TabsTrigger value="device" data-testid="tab-edit-upload-device">
+                                            <Upload className="mr-2 h-4 w-4" />
+                                            Upload from Device
+                                          </TabsTrigger>
+                                          <TabsTrigger value="url" data-testid="tab-edit-upload-url">
+                                            <LinkIcon className="mr-2 h-4 w-4" />
+                                            Upload via Link
+                                          </TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="device" className="space-y-2">
+                                          <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            className="hidden"
+                                            onChange={handleImageUpload}
+                                            data-testid="input-edit-file-upload-hidden"
+                                          />
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="w-full"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={isUploading}
+                                            data-testid="button-edit-upload-images"
+                                          >
+                                            <Upload className="mr-2 h-4 w-4" />
+                                            {isUploading ? "Uploading..." : "Upload Images"}
+                                          </Button>
+                                        </TabsContent>
+                                        <TabsContent value="url" className="space-y-2">
+                                          <div className="flex gap-2">
+                                            <Input
+                                              placeholder="Enter image URL"
+                                              value={imageUrl}
+                                              onChange={(e) => setImageUrl(e.target.value)}
+                                              onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                  e.preventDefault();
+                                                  handleAddImageUrl();
+                                                }
+                                              }}
+                                              data-testid="input-edit-image-url"
+                                            />
+                                            <Button
+                                              type="button"
+                                              onClick={handleAddImageUrl}
+                                              data-testid="button-edit-add-url"
+                                            >
+                                              Add
+                                            </Button>
+                                          </div>
+                                        </TabsContent>
+                                      </Tabs>
+                                    )}
                                   </div>
-                                </div>
 
-                                <div className="space-y-2">
-                                  <Label htmlFor="stockQuantity" data-testid="label-stock-quantity">
-                                    Stock Quantity
-                                  </Label>
-                                  <Input
-                                    id="stockQuantity"
-                                    type="number"
-                                    min="0"
-                                    value={editStock}
-                                    onChange={(e) => setEditStock(e.target.value)}
-                                    required
-                                    data-testid="input-stock-quantity"
-                                  />
-                                </div>
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-name" data-testid="label-edit-product-name">Product Name *</Label>
+                                      <Input
+                                        id="edit-name"
+                                        value={productForm.name}
+                                        onChange={(e) => setProductForm({...productForm, name: e.target.value})}
+                                        required
+                                        data-testid="input-edit-product-name"
+                                      />
+                                    </div>
 
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    id="inStock"
-                                    checked={editInStock}
-                                    onChange={(e) => setEditInStock(e.target.checked)}
-                                    data-testid="checkbox-in-stock"
-                                  />
-                                  <Label htmlFor="inStock" data-testid="label-in-stock">
-                                    Product Available (In Stock)
-                                  </Label>
-                                </div>
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-category" data-testid="label-edit-category">Category *</Label>
+                                      <Select value={productForm.category} onValueChange={(value) => setProductForm({...productForm, category: value})}>
+                                        <SelectTrigger data-testid="select-edit-category">
+                                          <SelectValue placeholder="Select category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="Jamdani Paithani">Jamdani Paithani</SelectItem>
+                                          <SelectItem value="Khun Irkal">Khun / Irkal (Ilkal)</SelectItem>
+                                          <SelectItem value="Ajrakh Modal">Ajrakh Modal</SelectItem>
+                                          <SelectItem value="Mul Mul Cotton">Mul Mul Cotton</SelectItem>
+                                          <SelectItem value="Khadi Cotton">Khadi Cotton</SelectItem>
+                                          <SelectItem value="Patch Work">Patch Work</SelectItem>
+                                          <SelectItem value="Pure Linen">Pure Linen</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </div>
 
-                                <div className="flex justify-end gap-2">
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setEditingProduct(null)}
-                                    data-testid="button-cancel"
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    type="submit"
-                                    disabled={updateInventoryMutation.isPending}
-                                    data-testid="button-save"
-                                  >
-                                    {updateInventoryMutation.isPending ? "Updating..." : "Update Stock"}
-                                  </Button>
-                                </div>
-                              </form>
-                            </DialogContent>
-                          </Dialog>
+                                  <div className="space-y-2">
+                                    <Label htmlFor="edit-description" data-testid="label-edit-description">Description</Label>
+                                    <Textarea
+                                      id="edit-description"
+                                      value={productForm.description}
+                                      onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                                      rows={3}
+                                      data-testid="input-edit-description"
+                                    />
+                                  </div>
+
+                                  <div className="grid grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-price" data-testid="label-edit-price">Price *</Label>
+                                      <Input
+                                        id="edit-price"
+                                        type="number"
+                                        step="0.01"
+                                        value={productForm.price}
+                                        onChange={(e) => setProductForm({...productForm, price: e.target.value})}
+                                        required
+                                        data-testid="input-edit-price"
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-originalPrice" data-testid="label-edit-original-price">Original Price</Label>
+                                      <Input
+                                        id="edit-originalPrice"
+                                        type="number"
+                                        step="0.01"
+                                        value={productForm.originalPrice}
+                                        onChange={(e) => setProductForm({...productForm, originalPrice: e.target.value})}
+                                        data-testid="input-edit-original-price"
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-stockQuantity" data-testid="label-edit-stock-quantity">Stock Quantity</Label>
+                                      <Input
+                                        id="edit-stockQuantity"
+                                        type="number"
+                                        value={productForm.stockQuantity}
+                                        onChange={(e) => setProductForm({...productForm, stockQuantity: e.target.value})}
+                                        data-testid="input-edit-stock-quantity"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-fabric">Fabric</Label>
+                                      <Input
+                                        id="edit-fabric"
+                                        value={productForm.fabric}
+                                        onChange={(e) => setProductForm({...productForm, fabric: e.target.value})}
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-color">Color</Label>
+                                      <Input
+                                        id="edit-color"
+                                        value={productForm.color}
+                                        onChange={(e) => setProductForm({...productForm, color: e.target.value})}
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-occasion">Occasion</Label>
+                                      <Input
+                                        id="edit-occasion"
+                                        value={productForm.occasion}
+                                        onChange={(e) => setProductForm({...productForm, occasion: e.target.value})}
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-pattern">Pattern</Label>
+                                      <Input
+                                        id="edit-pattern"
+                                        value={productForm.pattern}
+                                        onChange={(e) => setProductForm({...productForm, pattern: e.target.value})}
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-workType">Work Type</Label>
+                                      <Input
+                                        id="edit-workType"
+                                        value={productForm.workType}
+                                        onChange={(e) => setProductForm({...productForm, workType: e.target.value})}
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-sareeLength">Saree Length</Label>
+                                      <Input
+                                        id="edit-sareeLength"
+                                        value={productForm.sareeLength}
+                                        onChange={(e) => setProductForm({...productForm, sareeLength: e.target.value})}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div className="flex gap-6 flex-wrap">
+                                    <div className="flex items-center gap-2">
+                                      <Checkbox
+                                        id="edit-blousePiece"
+                                        checked={productForm.blousePiece}
+                                        onCheckedChange={(checked) => setProductForm({...productForm, blousePiece: checked as boolean})}
+                                      />
+                                      <Label htmlFor="edit-blousePiece">Blouse Piece</Label>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <Checkbox
+                                        id="edit-inStock"
+                                        checked={productForm.inStock}
+                                        onCheckedChange={(checked) => setProductForm({...productForm, inStock: checked as boolean})}
+                                      />
+                                      <Label htmlFor="edit-inStock">In Stock</Label>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <Checkbox
+                                        id="edit-isNew"
+                                        checked={productForm.isNew}
+                                        onCheckedChange={(checked) => setProductForm({...productForm, isNew: checked as boolean})}
+                                      />
+                                      <Label htmlFor="edit-isNew">New Arrival</Label>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <Checkbox
+                                        id="edit-isTrending"
+                                        checked={productForm.isTrending}
+                                        onCheckedChange={(checked) => setProductForm({...productForm, isTrending: checked as boolean})}
+                                      />
+                                      <Label htmlFor="edit-isTrending">Trending</Label>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <Checkbox
+                                        id="edit-isBestseller"
+                                        checked={productForm.isBestseller}
+                                        onCheckedChange={(checked) => setProductForm({...productForm, isBestseller: checked as boolean})}
+                                      />
+                                      <Label htmlFor="edit-isBestseller">Bestseller</Label>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <Checkbox
+                                        id="edit-onSale"
+                                        checked={productForm.onSale}
+                                        onCheckedChange={(checked) => setProductForm({...productForm, onSale: checked as boolean})}
+                                        data-testid="checkbox-edit-on-sale"
+                                      />
+                                      <Label htmlFor="edit-onSale" data-testid="label-edit-on-sale">On Sale</Label>
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-4 border-t pt-4">
+                                    <h3 className="font-semibold text-sm">Product Specifications</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div className="space-y-2">
+                                        <Label htmlFor="edit-fabricComposition">Fabric Composition</Label>
+                                        <Input
+                                          id="edit-fabricComposition"
+                                          value={productForm.fabricComposition}
+                                          onChange={(e) => setProductForm({...productForm, fabricComposition: e.target.value})}
+                                        />
+                                      </div>
+
+                                      <div className="space-y-2">
+                                        <Label htmlFor="edit-dimensions">Dimensions</Label>
+                                        <Input
+                                          id="edit-dimensions"
+                                          value={productForm.dimensions}
+                                          onChange={(e) => setProductForm({...productForm, dimensions: e.target.value})}
+                                        />
+                                      </div>
+
+                                      <div className="space-y-2">
+                                        <Label htmlFor="edit-weight">Weight</Label>
+                                        <Input
+                                          id="edit-weight"
+                                          value={productForm.weight}
+                                          onChange={(e) => setProductForm({...productForm, weight: e.target.value})}
+                                        />
+                                      </div>
+
+                                      <div className="space-y-2">
+                                        <Label htmlFor="edit-countryOfOrigin">Country of Origin</Label>
+                                        <Input
+                                          id="edit-countryOfOrigin"
+                                          value={productForm.countryOfOrigin}
+                                          onChange={(e) => setProductForm({...productForm, countryOfOrigin: e.target.value})}
+                                        />
+                                      </div>
+
+                                      <div className="space-y-2 col-span-2">
+                                        <Label htmlFor="edit-careInstructions">Care Instructions</Label>
+                                        <Textarea
+                                          id="edit-careInstructions"
+                                          value={productForm.careInstructions}
+                                          onChange={(e) => setProductForm({...productForm, careInstructions: e.target.value})}
+                                          rows={2}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex justify-end gap-2">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      onClick={() => setEditingProduct(null)}
+                                      data-testid="button-edit-cancel"
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      type="submit"
+                                      disabled={updateProductMutation.isPending}
+                                      data-testid="button-edit-submit"
+                                    >
+                                      {updateProductMutation.isPending ? "Updating..." : "Update Product"}
+                                    </Button>
+                                  </div>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
+
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setDeleteProductId(product._id)}
+                              data-testid={`button-delete-${product._id}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
@@ -453,6 +938,27 @@ export default function InventoryManagement() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!deleteProductId} onOpenChange={() => setDeleteProductId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this product. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-delete-cancel">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteProductId && deleteProductMutation.mutate(deleteProductId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-delete-confirm"
+            >
+              {deleteProductMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </div>
     </AdminLayout>
   );

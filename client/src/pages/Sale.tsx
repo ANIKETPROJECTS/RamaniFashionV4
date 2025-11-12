@@ -61,7 +61,7 @@ export default function Sale() {
     limit: "12",
     minPrice: priceRange[0].toString(),
     maxPrice: priceRange[1].toString(),
-    isSale: "true",
+    onSale: "true",
   });
 
   if (sortBy && order) {
@@ -102,7 +102,7 @@ export default function Sale() {
 
   // Build price range query params (without page/limit)
   const priceRangeParams = new URLSearchParams({
-    isSale: "true",
+    onSale: "true",
   });
   if (selectedCategories.length > 0) {
     priceRangeParams.append("category", selectedCategories.join(","));
