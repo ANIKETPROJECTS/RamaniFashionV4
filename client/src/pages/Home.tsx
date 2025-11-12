@@ -387,7 +387,7 @@ export default function Home() {
         >
           <div className="max-w-7xl mx-auto px-4 lg:px-3">
             <motion.div 
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
+              className="flex flex-row items-center justify-between gap-4 mb-6"
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -400,7 +400,7 @@ export default function Home() {
               </div>
               <button
                 onClick={() => setLocation("/trending-collection")}
-                className="px-6 md:px-8 py-2 md:py-3 bg-primary text-white border-2 border-white rounded-full hover:bg-primary/90 transition-colors font-bold text-sm md:text-base self-center sm:self-auto"
+                className="hidden sm:flex px-6 md:px-8 py-2 md:py-3 bg-primary text-white border-2 border-white rounded-full hover:bg-primary/90 transition-colors font-bold text-sm md:text-base"
                 data-testid="button-view-all-trending"
               >
                 View All
@@ -434,6 +434,15 @@ export default function Home() {
                   </motion.div>
                 ))}
               </motion.div>
+            </div>
+            <div className="flex sm:hidden justify-center mt-6">
+              <button
+                onClick={() => setLocation("/trending-collection")}
+                className="px-6 md:px-8 py-2 md:py-3 bg-primary text-white border-2 border-white rounded-full hover:bg-primary/90 transition-colors font-bold text-sm md:text-base"
+                data-testid="button-view-all-trending-mobile"
+              >
+                View All
+              </button>
             </div>
           </div>
         </motion.section>
