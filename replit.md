@@ -10,6 +10,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**November 13, 2025 - WhatsApp OTP Integration:**
+- **Real OTP Service:** Replaced test OTP (123456) with actual WhatsApp OTP delivery using superfast.akst.in API
+- **WhatsApp Service Module:** Created `server/whatsapp-service.ts` to handle OTP sending via WhatsApp Cloud API
+- **Random OTP Generation:** System now generates secure random 6-digit OTPs for each login attempt
+- **Template-based Messaging:** Uses pre-approved WhatsApp template "otpforcustomer" for OTP delivery
+- **Error Handling:** Proper error handling with automatic OTP cleanup on delivery failure
+- **Updated Files:** server/whatsapp-service.ts (new), server/routes.ts, client/src/components/LoginDialog.tsx
+- **Impact:**
+  - Customers receive OTP codes directly on WhatsApp instead of test codes
+  - More secure authentication with randomly generated OTPs
+  - Better user experience with instant WhatsApp delivery
+  - Test OTP display removed from login dialog
+- **Security:** API credentials stored as environment variables (WHATSAPP_API_KEY, WHATSAPP_PHONE_NUMBER_ID)
+- **Architecture:** Dedicated WhatsApp service module with clean separation of concerns; send-otp endpoint generates OTP, saves to database, and sends via WhatsApp with rollback on failure
+
 **November 13, 2025 - Customer OTP Login Flow Enhancement:**
 - **Centralized Authentication System:** Created auth utility (`client/src/lib/auth.ts`) to manage JWT tokens and customer data
 - **Event-Based Auth State:** Implemented custom event system to notify components when authentication state changes
