@@ -25,8 +25,6 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [notifyUpdates, setNotifyUpdates] = useState(false);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const DUMMY_OTP = "123456";
-
   const handlePhoneChange = (value: string) => {
     if (!/^\d*$/.test(value) || value.length > 10) return;
     setPhoneNumber(value);
@@ -330,10 +328,6 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   >
                     {verifyOtpMutation.isPending ? "Verifying..." : "Verify"}
                   </Button>
-
-                  <p className="text-xs text-center text-gray-500">
-                    Test OTP: <span className="font-semibold">{DUMMY_OTP}</span>
-                  </p>
                 </div>
               </div>
             )}
