@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { connectDB } from "./db";
-import { Product, User, Cart, Wishlist, Order, Address, ContactSubmission, OTP } from "./models";
+import { Product, User, Customer, Cart, Wishlist, Order, Address, ContactSubmission, OTP } from "./models";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import multer from "multer";
@@ -339,7 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/verify-otp", async (req, res) => {
     try {
-      const { phone, otp } = req.body;
+      const { phone, otp, notifyUpdates } = req.body;
 
       if (!phone || !otp) {
         return res.status(400).json({ error: 'Phone number and OTP are required' });
@@ -356,11 +356,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'OTP expired' });
       }
 
-      // Mark OTP as verified instead of deleting it
-      otpRecord.verified = true;
-      await otpRecord.save();
+      // Check if customer exists
+      let customer = await Customer.findOne({ phone });
+      
+      if (!customer) {
+        // Auto-create new customer
+        customer = new Customer({
+          phone,
+          phoneVerified: true,
+          notifyUpdates: notifyUpdates || false,
+        });
+        await customer.save();
+      } else {
+        // Update existing customer verification status
+        customer.phoneVerified = true;
+        if (notifyUpdates !== undefined) {
+          customer.notifyUpdates = notifyUpdates;
+        }
+        await customer.save();
+      }
 
-      res.json({ message: 'OTP verified successfully', verified: true });
+      // Clean up the used OTP
+      await OTP.deleteOne({ _id: otpRecord._id });
+
+      // Generate JWT token for customer
+      const token = jwt.sign({ 
+        userId: customer._id, 
+        phone: customer.phone,
+        type: 'customer'
+      }, JWT_SECRET);
+
+      res.json({ 
+        message: 'OTP verified successfully', 
+        verified: true,
+        token,
+        customer: { 
+          id: customer._id, 
+          phone: customer.phone,
+          name: customer.name,
+          email: customer.email
+        }
+      });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -368,11 +404,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/me", authenticateToken, async (req, res) => {
     try {
-      const user = await User.findById((req as any).user.userId).select('-password');
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+      const userType = (req as any).user.type || 'user';
+      
+      if (userType === 'customer') {
+        const customer = await Customer.findById((req as any).user.userId);
+        if (!customer) {
+          return res.status(404).json({ error: 'Customer not found' });
+        }
+        res.json(customer);
+      } else {
+        const user = await User.findById((req as any).user.userId).select('-password');
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+        res.json(user);
       }
-      res.json(user);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

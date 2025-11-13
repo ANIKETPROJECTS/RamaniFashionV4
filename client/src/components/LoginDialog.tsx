@@ -19,11 +19,11 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const { toast } = useToast();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [otpDigits, setOtpDigits] = useState<string[]>(Array(4).fill(""));
+  const [otpDigits, setOtpDigits] = useState<string[]>(Array(6).fill(""));
   const [notifyUpdates, setNotifyUpdates] = useState(false);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const DUMMY_OTP = "1234";
+  const DUMMY_OTP = "123456";
 
   const handlePhoneChange = (value: string) => {
     if (!/^\d*$/.test(value) || value.length > 10) return;
@@ -37,7 +37,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     newDigits[index] = value;
     setOtpDigits(newDigits);
 
-    if (value && index < 3) {
+    if (value && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
   };
@@ -47,6 +47,38 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       otpInputRefs.current[index - 1]?.focus();
     }
   };
+
+  const sendOtpMutation = useMutation({
+    mutationFn: async (phone: string) => {
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: `+91${phone}` }),
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error || "Failed to send OTP");
+      }
+
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "OTP Sent",
+        description: `Verification code sent to +91 ${phoneNumber}`,
+      });
+      setStep("otp");
+      setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to Send OTP",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
 
   const handleSendOtp = () => {
     if (phoneNumber.length !== 10) {
@@ -58,76 +90,40 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       return;
     }
 
-    toast({
-      title: "OTP Sent",
-      description: `Verification code sent to +91 ${phoneNumber}`,
-    });
-    setStep("otp");
-    setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+    sendOtpMutation.mutate(phoneNumber);
   };
 
-  const loginMutation = useMutation({
-    mutationFn: async (phone: string) => {
-      const res = await fetch("/api/auth/login", {
+  const verifyOtpMutation = useMutation({
+    mutationFn: async ({ phone, otp }: { phone: string; otp: string }) => {
+      const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, isOtpLogin: true }),
-        credentials: "include"
-      });
-
-      if (!res.ok) {
-        const error = await res.text();
-        throw new Error(error || "Login failed");
-      }
-
-      return res.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Welcome!",
-        description: data.message || "Login successful"
-      });
-      onOpenChange(false);
-      resetForm();
-      setLocation("/");
-    },
-    onError: (error: Error) => {
-      if (error.message.includes("not found")) {
-        registerMutation.mutate(phoneNumber);
-      } else {
-        toast({
-          title: "Login Failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      }
-    }
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: async (phone: string) => {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone,
-          name: `User ${phone.slice(-4)}`,
-          email: `${phone}@ramani.com`
+        body: JSON.stringify({ 
+          phone: `+91${phone}`, 
+          otp,
+          notifyUpdates 
         }),
-        credentials: "include"
       });
 
       if (!res.ok) {
         const error = await res.text();
-        throw new Error(error || "Registration failed");
+        throw new Error(error || "OTP verification failed");
       }
 
       return res.json();
     },
     onSuccess: (data) => {
+      // Store the token
+      if (data.token) {
+        localStorage.setItem('auth_token', data.token);
+      }
+      
+      const isNewCustomer = !data.customer?.name;
       toast({
-        title: "Welcome to Ramani Fashion!",
-        description: "Your account has been created successfully"
+        title: isNewCustomer ? "Welcome to Ramani Fashion!" : "Welcome Back!",
+        description: isNewCustomer 
+          ? "Your account has been created successfully" 
+          : data.message || "Login successful"
       });
       onOpenChange(false);
       resetForm();
@@ -135,7 +131,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Registration Failed",
+        title: "Verification Failed",
         description: error.message,
         variant: "destructive"
       });
@@ -145,27 +141,27 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const handleVerifyOtp = () => {
     const otp = otpDigits.join("");
     
-    if (otp !== DUMMY_OTP) {
+    if (otp.length !== 6) {
       toast({
         title: "Invalid OTP",
-        description: "Please enter the correct OTP",
+        description: "Please enter the 6-digit OTP",
         variant: "destructive"
       });
       return;
     }
 
-    loginMutation.mutate(phoneNumber);
+    verifyOtpMutation.mutate({ phone: phoneNumber, otp });
   };
 
   const resetForm = () => {
     setStep("phone");
     setPhoneNumber("");
-    setOtpDigits(Array(4).fill(""));
+    setOtpDigits(Array(6).fill(""));
   };
 
   const handleEdit = () => {
     setStep("phone");
-    setOtpDigits(Array(4).fill(""));
+    setOtpDigits(Array(6).fill(""));
   };
 
   return (
@@ -244,11 +240,11 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
 
                   <Button
                     onClick={handleSendOtp}
-                    disabled={phoneNumber.length !== 10}
+                    disabled={phoneNumber.length !== 10 || sendOtpMutation.isPending}
                     className="w-full rounded-lg h-12 text-base font-semibold bg-pink-500 hover:bg-pink-600 text-white"
                     data-testid="button-continue"
                   >
-                    Continue
+                    {sendOtpMutation.isPending ? "Sending..." : "Continue"}
                   </Button>
 
                   <div className="space-y-3 text-center">
@@ -294,7 +290,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 </div>
 
                 <div className="space-y-6">
-                  <div className="flex justify-center gap-3">
+                  <div className="flex justify-center gap-2">
                     {otpDigits.map((digit, index) => (
                       <input
                         key={index}
@@ -305,7 +301,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                         value={digit}
                         onChange={(e) => handleOtpDigitChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-14 h-16 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                        className="w-12 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
                         data-testid={`input-otp-digit-${index}`}
                       />
                     ))}
@@ -313,11 +309,11 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
 
                   <Button
                     onClick={handleVerifyOtp}
-                    disabled={otpDigits.join("").length !== 4 || loginMutation.isPending || registerMutation.isPending}
+                    disabled={otpDigits.join("").length !== 6 || verifyOtpMutation.isPending}
                     className="w-full rounded-lg h-12 text-base font-semibold bg-pink-500 hover:bg-pink-600 text-white"
                     data-testid="button-verify-otp"
                   >
-                    {loginMutation.isPending || registerMutation.isPending ? "Verifying..." : "Verify"}
+                    {verifyOtpMutation.isPending ? "Verifying..." : "Verify"}
                   </Button>
 
                   <p className="text-xs text-center text-gray-500">
