@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { LoginDialog } from "@/components/LoginDialog";
 import { auth } from "@/lib/auth";
+import { useAuthUI } from "@/contexts/AuthUIContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,7 +59,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
   const [storageUpdateTrigger, setStorageUpdateTrigger] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
-  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const { isLoginOpen, openLogin, closeLogin } = useAuthUI();
 
   // Parse URL to determine active navigation state
   const getActiveNavState = () => {
@@ -321,13 +322,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 variant="ghost" 
                 size="icon" 
                 className="h-12 w-12 hover:bg-gray-100" 
-                onClick={() => {
-                  if (auth.isAuthenticated()) {
-                    setLocation("/profile");
-                  } else {
-                    setLoginDialogOpen(true);
-                  }
-                }} 
+                onClick={openLogin} 
                 data-testid="button-login"
               >
                 <User className="h-8 w-8" />
@@ -706,7 +701,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
         </SheetContent>
       </Sheet>
 
-      <LoginDialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen} />
+      <LoginDialog open={isLoginOpen} onOpenChange={closeLogin} />
     </header>
   );
 }

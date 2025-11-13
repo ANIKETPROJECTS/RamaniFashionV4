@@ -126,14 +126,14 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       
       const isNewCustomer = !data.customer?.name;
       toast({
-        title: isNewCustomer ? "Welcome to Ramani Fashion!" : "Welcome Back!",
+        title: isNewCustomer ? "Your account has been created!" : "Welcome back!",
         description: isNewCustomer 
-          ? "Your account has been created. Complete your profile to continue." 
-          : data.message || "Login successful"
+          ? `Welcome to our store!` 
+          : `Good to see you again${data.customer?.name ? ', ' + data.customer.name : ''}!`
       });
       onOpenChange(false);
       resetForm();
-      setLocation("/profile");
+      setLocation("/");
     },
     onError: (error: Error) => {
       toast({

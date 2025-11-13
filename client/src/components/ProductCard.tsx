@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { localStorageService } from "@/lib/localStorage";
+import { useAuthUI } from "@/contexts/AuthUIContext";
 
 const prefetchProduct = async (productId: string) => {
   await queryClient.prefetchQuery({
@@ -61,6 +62,7 @@ export default function ProductCard({
   const [currentImage, setCurrentImage] = useState(image);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { openLogin } = useAuthUI();
 
   const addToCartMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/cart", "POST", data),
@@ -136,7 +138,7 @@ export default function ProductCard({
       const token = localStorage.getItem("token");
       if (!token) {
         toast({ title: "Please login to proceed with Buy Now", variant: "destructive" });
-        setLocation("/login");
+        openLogin();
         return;
       }
       buyNowMutation.mutate({ productId: id, quantity: 1 });

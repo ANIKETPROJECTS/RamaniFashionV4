@@ -14,11 +14,13 @@ import { useToast } from "@/hooks/use-toast";
 import { localStorageService } from "@/lib/localStorage";
 import ProductCard from "@/components/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthUI } from "@/contexts/AuthUIContext";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { openLogin } = useAuthUI();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [similarSort, setSimilarSort] = useState("rating-desc");
@@ -105,7 +107,7 @@ export default function ProductDetail() {
     const token = localStorage.getItem("token");
     if (!token) {
       toast({ title: "Please login to proceed with Buy Now", variant: "destructive" });
-      setLocation("/login");
+      openLogin();
       return;
     }
     buyNowMutation.mutate({ productId: product._id, quantity });

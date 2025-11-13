@@ -10,10 +10,12 @@ import { Trash2, ShoppingBag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { localStorageService } from "@/lib/localStorage";
 import { useState, useEffect } from "react";
+import { useAuthUI } from "@/contexts/AuthUIContext";
 
 export default function Cart() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { openLogin } = useAuthUI();
   const token = localStorage.getItem("token");
   const [guestCart, setGuestCart] = useState<any>(null);
 
@@ -273,7 +275,7 @@ export default function Cart() {
                   onClick={() => {
                     if (!token) {
                       toast({ title: "Please login to proceed with checkout", variant: "destructive" });
-                      setLocation("/login");
+                      openLogin();
                     } else {
                       setLocation("/checkout");
                     }

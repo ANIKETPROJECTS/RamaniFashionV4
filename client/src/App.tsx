@@ -3,13 +3,13 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthUIProvider } from "@/contexts/AuthUIContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import Home from "@/pages/Home";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
-import Login from "@/pages/Login";
 import Admin from "@/pages/Admin";
 import Occasions from "@/pages/Occasions";
 import Collections from "@/pages/Collections";
@@ -37,7 +37,6 @@ function Router() {
       <Route path="/product/:id" component={ProductDetail} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
-      <Route path="/login" component={Login} />
       <Route path="/categories" component={Products} />
       <Route path="/new-arrivals" component={NewArrivals} />
       <Route path="/trending-collection" component={TrendingCollection} />
@@ -65,9 +64,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <ScrollToTop />
-        <Toaster />
-        <Router />
+        <AuthUIProvider>
+          <ScrollToTop />
+          <Toaster />
+          <Router />
+        </AuthUIProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

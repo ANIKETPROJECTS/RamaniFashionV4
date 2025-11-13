@@ -11,10 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthUI } from "@/contexts/AuthUIContext";
 
 export default function Checkout() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { openLogin } = useAuthUI();
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
@@ -23,9 +25,9 @@ export default function Checkout() {
     const token = localStorage.getItem("token");
     if (!token) {
       toast({ title: "Please login to proceed with checkout", variant: "destructive" });
-      setLocation("/login");
+      openLogin();
     }
-  }, [setLocation, toast]);
+  }, [openLogin, toast]);
   
   const [addressData, setAddressData] = useState({
     fullName: "",

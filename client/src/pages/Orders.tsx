@@ -9,9 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Package, ShoppingBag } from "lucide-react";
 import { format } from "date-fns";
+import { useAuthUI } from "@/contexts/AuthUIContext";
 
 export default function Orders() {
   const [, setLocation] = useLocation();
+  const { openLogin } = useAuthUI();
 
   const { data: orders, isLoading, isError, error } = useQuery({
     queryKey: ["/api/orders"],
@@ -65,7 +67,7 @@ export default function Orders() {
           </p>
           <div className="flex gap-2 justify-center">
             {isUnauthorized ? (
-              <Button onClick={() => setLocation("/login")} data-testid="button-login">
+              <Button onClick={openLogin} data-testid="button-login">
                 Login
               </Button>
             ) : isError ? (
