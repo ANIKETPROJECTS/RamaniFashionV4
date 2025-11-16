@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { migrateGuestDataToServer } from "@/lib/migrateGuestData";
+import { colorPreferences } from "@/lib/colorPreferences";
 
 export default function Login() {
   const { toast } = useToast();
@@ -37,6 +38,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       await migrateGuestDataToServer();
+      colorPreferences.migrateGuestPreferences();
       toast({ 
         title: "Welcome back!", 
         description: `Good to see you again, ${data.user.name || 'there'}!`
@@ -67,6 +69,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       await migrateGuestDataToServer();
+      colorPreferences.migrateGuestPreferences();
       toast({ 
         title: "Your account has been created!", 
         description: `Welcome to our store, ${data.user.name}!`
