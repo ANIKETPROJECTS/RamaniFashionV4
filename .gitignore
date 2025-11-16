@@ -6,3 +6,6 @@ vite.config.ts.*
 *.tar.gz
 # Uploaded files
 uploads/
+# Environment variables
+.env
+.env.local
