@@ -23,7 +23,7 @@ export default function PaymentCallback() {
   }, []);
 
   const { data: paymentStatus, isLoading } = useQuery({
-    queryKey: [`/api/payment/phonepe/status/${merchantOrderId}`, merchantOrderId],
+    queryKey: ['/api/payment/phonepe/status', merchantOrderId],
     enabled: !!merchantOrderId,
     refetchInterval: (query) => {
       const data = query.state.data as any;
@@ -42,7 +42,7 @@ export default function PaymentCallback() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ 
-        queryKey: [`/api/payment/phonepe/status/${merchantOrderId}`, merchantOrderId] 
+        queryKey: ['/api/payment/phonepe/status', merchantOrderId] 
       });
       toast({ title: "Payment status updated" });
     },
