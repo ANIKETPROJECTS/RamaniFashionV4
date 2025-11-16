@@ -10,6 +10,7 @@ import fs from "fs";
 import XLSX from "xlsx";
 import { upload } from "./upload-config";
 import { sendWhatsAppOTP, generateOTP } from "./whatsapp-service";
+import { phonePeService } from "./phonepe-service";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "ramani-fashion-secret-key";
 const ADMIN_JWT_SECRET = process.env.ADMIN_SESSION_SECRET || "ramani-admin-secret-key-2024";
@@ -755,6 +756,144 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(order);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/payment/phonepe/initiate", authenticateToken, async (req, res) => {
+    try {
+      const { orderId, amount } = req.body;
+
+      if (!orderId || !amount) {
+        return res.status(400).json({ error: 'Order ID and amount are required' });
+      }
+
+      const order = await Order.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      if (order.userId.toString() !== (req as any).user.userId) {
+        return res.status(403).json({ error: 'Unauthorized access to order' });
+      }
+
+      const merchantOrderId = order.orderNumber || `RM${Date.now()}`;
+      const amountInPaisa = Math.round(amount * 100);
+      
+      const baseUrl = process.env.REPLIT_DOMAINS 
+        ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+        : `http://localhost:${process.env.PORT || 5000}`;
+      const redirectUrl = `${baseUrl}/payment-callback`;
+
+      const paymentResponse = await phonePeService.initiatePayment({
+        merchantOrderId,
+        amount: amountInPaisa,
+        redirectUrl,
+        udf1: orderId,
+        udf2: (req as any).user.userId,
+      });
+
+      if (!paymentResponse.success) {
+        return res.status(500).json({ error: paymentResponse.error || 'Failed to initiate payment' });
+      }
+
+      await Order.findByIdAndUpdate(orderId, {
+        phonePeMerchantOrderId: merchantOrderId,
+        phonePeOrderId: paymentResponse.orderId,
+        phonePePaymentState: paymentResponse.state,
+        updatedAt: new Date(),
+      });
+
+      res.json({
+        success: true,
+        redirectUrl: paymentResponse.redirectUrl,
+        orderId: paymentResponse.orderId,
+        merchantOrderId,
+      });
+    } catch (error: any) {
+      console.error('PhonePe payment initiation error:', error);
+      res.status(500).json({ error: error.message || 'Failed to initiate payment' });
+    }
+  });
+
+  app.get("/api/payment/phonepe/status/:merchantOrderId", authenticateToken, async (req, res) => {
+    try {
+      const { merchantOrderId } = req.params;
+
+      const statusResponse = await phonePeService.checkOrderStatus(merchantOrderId);
+
+      if (!statusResponse.success) {
+        return res.status(500).json({ error: statusResponse.error || 'Failed to check payment status' });
+      }
+
+      const order = await Order.findOne({ phonePeMerchantOrderId: merchantOrderId });
+      if (order) {
+        const paymentStatus = statusResponse.state === 'COMPLETED' ? 'paid' : 
+                             statusResponse.state === 'FAILED' ? 'failed' : 'pending';
+        
+        await Order.findByIdAndUpdate(order._id, {
+          phonePePaymentState: statusResponse.state,
+          phonePePaymentDetails: statusResponse.paymentDetails,
+          paymentStatus,
+          orderStatus: paymentStatus === 'paid' ? 'processing' : order.orderStatus,
+          updatedAt: new Date(),
+        });
+      }
+
+      res.json({
+        success: true,
+        state: statusResponse.state,
+        orderId: statusResponse.orderId,
+        amount: statusResponse.amount,
+        paymentDetails: statusResponse.paymentDetails,
+      });
+    } catch (error: any) {
+      console.error('PhonePe status check error:', error);
+      res.status(500).json({ error: error.message || 'Failed to check payment status' });
+    }
+  });
+
+  app.post("/api/payment/phonepe/webhook", async (req, res) => {
+    try {
+      const authHeader = req.headers['authorization'];
+      const responseBody = JSON.stringify(req.body);
+
+      const webhookUsername = process.env.PHONEPE_WEBHOOK_USERNAME || '';
+      const webhookPassword = process.env.PHONEPE_WEBHOOK_PASSWORD || '';
+
+      const validationResult = phonePeService.validateCallback(
+        authHeader as string,
+        responseBody,
+        webhookUsername,
+        webhookPassword
+      );
+
+      if (!validationResult.isValid) {
+        return res.status(401).json({ error: 'Invalid webhook signature' });
+      }
+
+      const callbackData = validationResult.data;
+      
+      if (callbackData && callbackData.merchantOrderId) {
+        const order = await Order.findOne({ phonePeMerchantOrderId: callbackData.merchantOrderId });
+        if (order) {
+          const paymentStatus = callbackData.state === 'COMPLETED' ? 'paid' :
+                               callbackData.state === 'FAILED' ? 'failed' : 'pending';
+          
+          await Order.findByIdAndUpdate(order._id, {
+            phonePePaymentState: callbackData.state,
+            phonePeTransactionId: callbackData.transactionId,
+            phonePePaymentDetails: callbackData.paymentDetails,
+            paymentStatus,
+            orderStatus: paymentStatus === 'paid' ? 'processing' : order.orderStatus,
+            updatedAt: new Date(),
+          });
+        }
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('PhonePe webhook error:', error);
+      res.status(500).json({ error: error.message || 'Webhook processing failed' });
     }
   });
 
