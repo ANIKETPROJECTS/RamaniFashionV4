@@ -238,16 +238,24 @@ export default function InventoryManagement() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const colorVariants = editingProduct.colorVariants || [{
-      color: productForm.color || 'Default',
-      images: uploadedImages.length > 0 ? uploadedImages : (editingProduct.images || [])
-    }];
+    let colorVariants;
+    if (editingProduct) {
+      colorVariants = editingProduct.colorVariants || [{
+        color: productForm.color || 'Default',
+        images: uploadedImages.length > 0 ? uploadedImages : (editingProduct.images || [])
+      }];
 
-    if (uploadedImages.length > 0 && productForm.color && colorVariants.length > 0) {
-      colorVariants[0] = {
-        color: productForm.color,
+      if (uploadedImages.length > 0 && productForm.color && colorVariants.length > 0) {
+        colorVariants[0] = {
+          color: productForm.color,
+          images: uploadedImages
+        };
+      }
+    } else {
+      colorVariants = [{
+        color: productForm.color || 'Default',
         images: uploadedImages
-      };
+      }];
     }
     
     const formattedData = {

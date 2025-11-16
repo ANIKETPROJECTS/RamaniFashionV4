@@ -1666,16 +1666,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/orders/:id/status", authenticateAdmin, async (req, res) => {
     try {
       const { orderStatus, paymentStatus } = req.body;
+      
+      const validOrderStatuses = ['pending', 'approved', 'processing', 'shipped', 'delivered', 'cancelled'];
+      const validPaymentStatuses = ['pending', 'paid', 'failed'];
+      
+      if (orderStatus && !validOrderStatuses.includes(orderStatus)) {
+        return res.status(400).json({ 
+          error: `Invalid order status. Must be one of: ${validOrderStatuses.join(', ')}` 
+        });
+      }
+      
+      if (paymentStatus && !validPaymentStatuses.includes(paymentStatus)) {
+        return res.status(400).json({ 
+          error: `Invalid payment status. Must be one of: ${validPaymentStatuses.join(', ')}` 
+        });
+      }
+      
       const order = await Order.findById(req.params.id);
       
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
-      if (orderStatus === 'processing' || orderStatus === 'shipped') {
+      if (orderStatus === 'processing' || orderStatus === 'shipped' || orderStatus === 'delivered') {
         if (!order.approved) {
           return res.status(400).json({ 
-            error: 'Order must be approved before it can be processed or shipped' 
+            error: 'Order must be approved before it can be processed, shipped, or delivered' 
           });
         }
       }
@@ -1688,7 +1704,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedOrder = await Order.findByIdAndUpdate(
         req.params.id,
         updateData,
-        { new: true }
+        { new: true, runValidators: true }
       ).populate('userId', 'name email phone');
       
       res.json(updatedOrder);
