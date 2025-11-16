@@ -20,7 +20,7 @@ export default function PaymentCallback() {
   }, []);
 
   const { data: paymentStatus, isLoading } = useQuery({
-    queryKey: ["/api/payment/phonepe/status", merchantOrderId],
+    queryKey: [`/api/payment/phonepe/status/${merchantOrderId}`, merchantOrderId],
     enabled: !!merchantOrderId,
     refetchInterval: (query) => {
       const data = query.state.data as any;
