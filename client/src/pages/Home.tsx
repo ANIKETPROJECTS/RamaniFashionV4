@@ -346,7 +346,7 @@ export default function Home() {
                     <NewArrivalCard
                       id={product._id}
                       name={product.name}
-                      image={product.images?.[0]}
+                      image={product.displayImages?.[0] || product.images?.[0]}
                       price={product.price}
                       originalPrice={product.originalPrice}
                       discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
@@ -432,7 +432,7 @@ export default function Home() {
                     <NewArrivalCard
                       id={product._id}
                       name={product.name}
-                      image={product.images?.[0]}
+                      image={product.displayImages?.[0] || product.images?.[0]}
                       price={product.price}
                       originalPrice={product.originalPrice}
                       discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}

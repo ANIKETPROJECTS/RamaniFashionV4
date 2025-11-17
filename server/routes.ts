@@ -225,7 +225,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/products/:id", async (req, res) => {
     try {
-      const product = await Product.findById(req.params.id).lean();
+      let productId = req.params.id;
+      
+      // Handle variant IDs (format: baseProductId_variant_index)
+      if (productId.includes('_variant_')) {
+        const parts = productId.split('_variant_');
+        productId = parts[0]; // Extract the base product ID
+      }
+      
+      const product = await Product.findById(productId).lean();
       if (!product) {
         return res.status(404).json({ error: 'Product not found' });
       }

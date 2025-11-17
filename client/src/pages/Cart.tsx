@@ -165,6 +165,7 @@ export default function Cart() {
                 ? product.colorVariants.find((v: any) => v.color === item.selectedColor)
                 : null;
               const displayImage = selectedColorVariant?.images?.[0] 
+                || product?.displayImages?.[0]
                 || product?.images?.[0] 
                 || "/api/placeholder/120/150";
               

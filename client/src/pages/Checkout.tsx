@@ -132,7 +132,7 @@ export default function Checkout() {
         name: item.productId.name,
         price: item.productId.price,
         quantity: item.quantity,
-        image: item.productId.images?.[0],
+        image: item.productId.displayImages?.[0] || item.productId.images?.[0],
       })),
       shippingAddress: {
         fullName: selectedAddr.fullName,

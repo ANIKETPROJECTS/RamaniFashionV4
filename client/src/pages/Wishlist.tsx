@@ -146,7 +146,7 @@ export default function Wishlist() {
             <Card key={product._id} className="overflow-hidden hover-elevate" data-testid={`wishlist-item-${product._id}`}>
               <div className="relative">
                 <img
-                  src={product.images?.[0] || "/api/placeholder/300/400"}
+                  src={product.displayImages?.[0] || product.images?.[0] || "/api/placeholder/300/400"}
                   alt={product.name}
                   className="w-full h-80 object-cover cursor-pointer"
                   onClick={() => setLocation(`/product/${product._id}`)}

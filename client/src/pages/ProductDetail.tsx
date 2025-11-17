@@ -15,7 +15,6 @@ import { localStorageService } from "@/lib/localStorage";
 import ProductCard from "@/components/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthUI } from "@/contexts/AuthUIContext";
-import { colorPreferences } from "@/lib/colorPreferences";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -25,7 +24,21 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [similarSort, setSimilarSort] = useState("rating-desc");
-  const [preferenceVersion, setPreferenceVersion] = useState(0);
+
+  // Extract base product ID and variant index from URL
+  const { baseProductId, variantIndexFromUrl } = useMemo(() => {
+    if (!id) return { baseProductId: '', variantIndexFromUrl: 0 };
+    
+    if (id.includes('_variant_')) {
+      const parts = id.split('_variant_');
+      return {
+        baseProductId: parts[0],
+        variantIndexFromUrl: parseInt(parts[1]) || 0
+      };
+    }
+    
+    return { baseProductId: id, variantIndexFromUrl: 0 };
+  }, [id]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -42,9 +55,12 @@ export default function ProductDetail() {
   });
 
   const selectedColorIndex = useMemo(() => {
-    if (!product || !id || product._id !== id) return 0;
-    return colorPreferences.getPreferredVariantIndex(id, product);
-  }, [product, id, preferenceVersion]);
+    if (!product) return variantIndexFromUrl;
+    
+    // Guard against out-of-range variant index
+    const maxIndex = (product.colorVariants?.length || 1) - 1;
+    return Math.min(variantIndexFromUrl, Math.max(0, maxIndex));
+  }, [product, variantIndexFromUrl]);
 
   const { data: similarProducts } = useQuery({
     queryKey: ["/api/products", "similar", product?.category, id, similarSort],
@@ -57,8 +73,8 @@ export default function ProductDetail() {
       if (!response.ok) return [];
       const data = await response.json();
       return data.products?.filter((p: any) => {
-        const productId = p.baseProductId || p._id;
-        return productId !== id;
+        const productBaseId = p.baseProductId || p._id;
+        return productBaseId !== baseProductId;
       }).slice(0, 8) || [];
     },
     enabled: !!product?.category,
@@ -182,11 +198,11 @@ export default function ProductDetail() {
     : 0;
 
   const handleColorChange = (index: number) => {
-    setSelectedImage(0);
-    if (id) {
-      colorPreferences.setPreference(id, index);
-      setPreferenceVersion(v => v + 1);
-    }
+    if (!product) return;
+    
+    // Navigate to the variant's product page
+    const variantId = `${baseProductId}_variant_${index}`;
+    setLocation(`/product/${variantId}`);
   };
 
   return (
@@ -633,7 +649,7 @@ export default function ProductDetail() {
                     name={similarProduct.name}
                     price={similarProduct.price}
                     originalPrice={similarProduct.originalPrice}
-                    image={similarProduct.images?.[0] || "/api/placeholder/400/600"}
+                    image={similarProduct.displayImages?.[0] || similarProduct.images?.[0] || "/api/placeholder/400/600"}
                     rating={similarProduct.rating}
                     reviewCount={similarProduct.reviewCount}
                     isNew={similarProduct.isNew}
