@@ -2,12 +2,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { useLocation } from "wouter";
+import { useState } from "react";
 import placeholderImage from "@assets/stock_images/elegant_saree_produc_6a8286b5.jpg";
 
 interface NewArrivalCardProps {
   id: string;
   name: string;
   image: string;
+  secondaryImage?: string;
   price: number;
   originalPrice?: number;
   discount?: number;
@@ -20,6 +22,7 @@ export default function NewArrivalCard({
   id,
   name,
   image,
+  secondaryImage,
   price,
   originalPrice,
   discount,
@@ -28,6 +31,7 @@ export default function NewArrivalCard({
   onClick,
 }: NewArrivalCardProps) {
   const [, setLocation] = useLocation();
+  const [currentImage, setCurrentImage] = useState(image);
 
   return (
     <Card 
@@ -37,9 +41,11 @@ export default function NewArrivalCard({
     >
       <div className="relative aspect-[3/5] overflow-hidden bg-gray-100">
         <img
-          src={image || placeholderImage}
+          src={currentImage || placeholderImage}
           alt={name}
           className="w-full h-full object-cover"
+          onMouseEnter={() => secondaryImage && setCurrentImage(secondaryImage)}
+          onMouseLeave={() => setCurrentImage(image)}
         />
         
         <Badge 

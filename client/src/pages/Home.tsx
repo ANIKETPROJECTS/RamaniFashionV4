@@ -347,6 +347,7 @@ export default function Home() {
                       id={product._id}
                       name={product.name}
                       image={product.displayImages?.[0] || product.images?.[0]}
+                      secondaryImage={product.displayImages?.[1] || product.images?.[1]}
                       price={product.price}
                       originalPrice={product.originalPrice}
                       discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
@@ -433,6 +434,7 @@ export default function Home() {
                       id={product._id}
                       name={product.name}
                       image={product.displayImages?.[0] || product.images?.[0]}
+                      secondaryImage={product.displayImages?.[1] || product.images?.[1]}
                       price={product.price}
                       originalPrice={product.originalPrice}
                       discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
