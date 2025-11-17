@@ -68,7 +68,8 @@ export default function ProductCard({
   const { toast } = useToast();
   const { openLogin } = useAuthUI();
   
-  const productDetailId = baseProductId || id;
+  // Use the actual product ID (including variant info) for navigation
+  const productDetailId = id;
 
   const addToCartMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/cart", "POST", data),
@@ -117,7 +118,8 @@ export default function ProductCard({
     },
   });
 
-  const cartProductId = baseProductId || id;
+  // Use the actual product ID (including variant info) for cart/wishlist operations
+  const cartProductId = id;
   
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
