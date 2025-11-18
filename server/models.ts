@@ -405,6 +405,14 @@ reviewSchema.post('deleteMany', async function() {
   }
 });
 
+// Settings Schema (for configurable app settings)
+const settingsSchema = new Schema({
+  shippingCharges: { type: Number, default: 0 },
+  freeShippingThreshold: { type: Number, default: 999 },
+  updatedAt: { type: Date, default: Date.now },
+  updatedBy: { type: String },
+});
+
 // Export models
 export const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 export const User = mongoose.models.User || mongoose.model('User', userSchema);
@@ -416,3 +424,4 @@ export const Order = mongoose.models.Order || mongoose.model('Order', orderSchem
 export const ContactSubmission = mongoose.models.ContactSubmission || mongoose.model('ContactSubmission', contactSubmissionSchema);
 export const OTP = mongoose.models.OTP || mongoose.model('OTP', otpSchema);
 export const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
+export const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);

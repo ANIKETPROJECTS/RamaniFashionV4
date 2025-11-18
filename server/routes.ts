@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { connectDB } from "./db";
-import { Product, User, Customer, Cart, Wishlist, Order, Address, ContactSubmission, OTP, Review } from "./models";
+import { Product, User, Customer, Cart, Wishlist, Order, Address, ContactSubmission, OTP, Review, Settings } from "./models";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -2284,6 +2284,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json({ success: true, message: 'Review deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Settings Routes
+  app.get("/api/settings", async (req, res) => {
+    try {
+      let settings = await Settings.findOne();
+      
+      if (!settings) {
+        settings = await Settings.create({
+          shippingCharges: 0,
+          freeShippingThreshold: 999
+        });
+      }
+      
+      res.json(settings);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/admin/settings", authenticateAdmin, async (req, res) => {
+    try {
+      let settings = await Settings.findOne();
+      
+      if (!settings) {
+        settings = await Settings.create({
+          shippingCharges: 0,
+          freeShippingThreshold: 999
+        });
+      }
+      
+      res.json(settings);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/admin/settings", authenticateAdmin, async (req, res) => {
+    try {
+      const { shippingCharges, freeShippingThreshold } = req.body;
+      
+      if (shippingCharges !== undefined && shippingCharges < 0) {
+        return res.status(400).json({ error: 'Shipping charges cannot be negative' });
+      }
+      
+      if (freeShippingThreshold !== undefined && freeShippingThreshold < 0) {
+        return res.status(400).json({ error: 'Free shipping threshold cannot be negative' });
+      }
+      
+      let settings = await Settings.findOne();
+      
+      if (!settings) {
+        settings = await Settings.create({
+          shippingCharges: shippingCharges ?? 0,
+          freeShippingThreshold: freeShippingThreshold ?? 999,
+          updatedBy: req.admin.username,
+          updatedAt: new Date()
+        });
+      } else {
+        if (shippingCharges !== undefined) settings.shippingCharges = shippingCharges;
+        if (freeShippingThreshold !== undefined) settings.freeShippingThreshold = freeShippingThreshold;
+        settings.updatedBy = req.admin.username;
+        settings.updatedAt = new Date();
+        await settings.save();
+      }
+      
+      res.json(settings);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
