@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { connectDB } from "./db";
 import { Product, User, Customer, Cart, Wishlist, Order, Address, ContactSubmission, OTP, Review } from "./models";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import multer from "multer";
@@ -270,7 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Calculate rating distribution
       const ratingDistribution = await Review.aggregate([
-        { $match: { productId: productId as any } },
+        { $match: { productId: new mongoose.Types.ObjectId(productId) } },
         { $group: { _id: '$rating', count: { $sum: 1 } } },
         { $sort: { _id: -1 } }
       ]);
