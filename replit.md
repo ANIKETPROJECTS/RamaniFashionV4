@@ -7,6 +7,12 @@ Ramani Fashion India is a full-stack e-commerce web application specializing in 
 ## Recent Changes
 
 ### November 18, 2025
+- **Fixed Admin Panel Navigation:** Refactored Analytics component to use shared AdminLayout instead of duplicate sidebar, ensuring all navigation sections (Dashboard, Products, Inventory, Orders, Customers, Reviews) remain visible across all admin pages
+- **Enhanced Real-Time Cache Synchronization:** Implemented cross-cache invalidation between admin panel and customer website for review operations:
+  - Customer review submissions now instantly update admin review management panel
+  - Admin review deletions now instantly reflect on product detail pages
+  - Uses React Query cache invalidation with exact: false to match all pagination variants
+  - Includes guards for edge cases (deleted products, null references)
 - **Fixed Analytics Page:** Corrected API response handling to properly parse paginated customer and order data, preventing page crashes
 - **Added Review Management:** Created comprehensive admin section for managing product reviews with:
   - Complete review details including product info, customer info, ratings, comments, and verification status
