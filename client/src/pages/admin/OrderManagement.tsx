@@ -867,7 +867,7 @@ export default function OrderManagement() {
                   </div>
                 )}
 
-                {!selectedOrder.approved && selectedOrder.orderStatus === 'pending' && (
+                {!selectedOrder.approved && (selectedOrder.orderStatus === 'pending' || selectedOrder.orderStatus === 'processing') && (
                   <div className="space-y-3 pt-4 border-t">
                     {selectedOrder.paymentMethod !== 'cod' && selectedOrder.paymentStatus !== 'paid' && (
                       <div className="text-sm text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 p-3 rounded-md">
