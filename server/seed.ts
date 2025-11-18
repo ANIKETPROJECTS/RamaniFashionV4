@@ -1,5 +1,5 @@
 import { connectDB } from './db';
-import { Product } from './models';
+import { Product, Settings } from './models';
 
 const sampleProducts = [
   {
@@ -535,6 +535,17 @@ const sampleProducts = [
 export async function seedDatabase() {
   try {
     await connectDB();
+    
+    // Initialize settings if they don't exist
+    let settings = await Settings.findOne();
+    if (!settings) {
+      console.log('🌱 Initializing default settings...');
+      settings = await Settings.create({
+        shippingCharges: 0,
+        freeShippingThreshold: 999
+      });
+      console.log('✅ Settings initialized with shipping charges: ₹0, free shipping threshold: ₹999');
+    }
     
     const count = await Product.countDocuments();
     if (count === 0) {

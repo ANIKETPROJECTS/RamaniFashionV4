@@ -41,12 +41,16 @@ export default function Checkout() {
     addressType: "home" as "home" | "office",
   });
 
-  const { data: cart } = useQuery({
+  const { data: cart, isLoading: cartLoading, isFetching: cartFetching } = useQuery({
     queryKey: ["/api/cart"],
   });
 
   const { data: addresses } = useQuery({
     queryKey: ["/api/addresses"],
+  });
+
+  const { data: settings, isLoading: settingsLoading, isFetching: settingsFetching } = useQuery({
+    queryKey: ["/api/settings"],
   });
 
   const createAddressMutation = useMutation({
@@ -104,12 +108,27 @@ export default function Checkout() {
     phonePePaymentMutation.mutate({ orderId, amount });
   };
 
+  // Block rendering if data is loading or refetching to prevent incorrect totals
+  if (cartLoading || cartFetching || settingsLoading || settingsFetching) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+          Loading checkout...
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   const items = (cart as any)?.items || [];
   const subtotal = items.reduce((sum: number, item: any) => {
     return sum + (item.productId?.price || 0) * item.quantity;
   }, 0);
 
-  const shippingCharges = subtotal >= 999 ? 0 : 99;
+  const settingsShippingCharges = (settings as any)?.shippingCharges ?? 0;
+  const settingsFreeShippingThreshold = (settings as any)?.freeShippingThreshold ?? 999;
+  const shippingCharges = subtotal >= settingsFreeShippingThreshold ? 0 : settingsShippingCharges;
   const total = subtotal + shippingCharges;
 
   const handleAddAddress = (e: React.FormEvent) => {

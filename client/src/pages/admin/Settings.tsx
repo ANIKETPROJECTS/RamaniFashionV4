@@ -1,172 +1,179 @@
-import { Link, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
+import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  LayoutDashboard, 
-  Package, 
-  Warehouse, 
-  BarChart3, 
-  Settings,
-  LogOut
-} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Truck } from "lucide-react";
 
-export default function AdminSettings() {
-  const [location, setLocation] = useLocation();
+export default function Settings() {
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const adminToken = localStorage.getItem("adminToken");
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("admin");
-    setLocation("/login");
+  const [shippingCharges, setShippingCharges] = useState("0");
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState("999");
+
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ["/api/admin/settings"],
+    enabled: !!adminToken,
+  });
+
+  useEffect(() => {
+    if (settings) {
+      setShippingCharges(((settings as any).shippingCharges ?? 0).toString());
+      setFreeShippingThreshold(((settings as any).freeShippingThreshold ?? 999).toString());
+    }
+  }, [settings]);
+
+  const updateSettingsMutation = useMutation({
+    mutationFn: (data: { shippingCharges: number; freeShippingThreshold: number }) =>
+      apiRequest("/api/admin/settings", "PUT", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+      toast({ 
+        title: "Settings updated successfully!",
+        description: "Shipping settings have been saved."
+      });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Error updating settings", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const handleSaveShipping = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const charges = parseFloat(shippingCharges);
+    const threshold = parseFloat(freeShippingThreshold);
+
+    if (isNaN(charges) || charges < 0) {
+      toast({ 
+        title: "Invalid shipping charges", 
+        description: "Please enter a valid non-negative number",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    if (isNaN(threshold) || threshold < 0) {
+      toast({ 
+        title: "Invalid threshold", 
+        description: "Please enter a valid non-negative number",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    updateSettingsMutation.mutate({
+      shippingCharges: charges,
+      freeShippingThreshold: threshold
+    });
   };
 
   if (!adminToken) {
-    setLocation("/login");
+    setLocation("/admin/login");
     return null;
   }
 
-  const menuItems = [
-    { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/admin/products", label: "Products", icon: Package },
-    { path: "/admin/inventory", label: "Inventory", icon: Warehouse },
-    { path: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { path: "/admin/settings", label: "Settings", icon: Settings },
-  ];
-
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed h-full">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Ramani Admin</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Fashion Management</p>
-        </div>
-        
-        <nav className="px-4 space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.path;
-            return (
-              <Link key={item.path} href={item.path}>
-                <Button
-                  variant={isActive ? "secondary" : "ghost"}
-                  className="w-full justify-start"
-                >
-                  <Icon className="mr-2 h-4 w-4" />
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="absolute bottom-0 w-64 p-4">
-          <Button variant="outline" className="w-full justify-start" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        </div>
-      </aside>
-
-      <main className="ml-64 flex-1 p-8">
-        <div className="max-w-4xl">
+    <AdminLayout>
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="text-page-title">
-              Settings
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2" data-testid="text-page-title">
+              Store Settings
             </h2>
-            <p className="text-gray-500 dark:text-gray-400">
-              Manage your admin preferences and store settings
+            <p className="text-muted-foreground">
+              Configure your store's settings and preferences
             </p>
           </div>
 
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Admin Profile</CardTitle>
-                <CardDescription>Update your admin account information</CardDescription>
+                <div className="flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-pink-600" />
+                  <CardTitle>Shipping Settings</CardTitle>
+                </div>
+                <CardDescription>
+                  Configure shipping charges and free shipping threshold for your store
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="adminEmail">Email</Label>
-                  <Input
-                    id="adminEmail"
-                    type="email"
-                    defaultValue="admin@ramanifashion.com"
-                    disabled
-                    data-testid="input-admin-email"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="adminRole">Role</Label>
-                  <Input
-                    id="adminRole"
-                    defaultValue="Administrator"
-                    disabled
-                    data-testid="input-admin-role"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+              <CardContent>
+                <form onSubmit={handleSaveShipping} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="shippingCharges">Shipping Charges (₹)</Label>
+                    <Input
+                      id="shippingCharges"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={shippingCharges}
+                      onChange={(e) => setShippingCharges(e.target.value)}
+                      placeholder="Enter shipping charges (e.g., 99)"
+                      data-testid="input-shipping-charges"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Amount charged for shipping. Set to 0 for free shipping on all orders.
+                    </p>
+                  </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Store Settings</CardTitle>
-                <CardDescription>Configure your store's basic settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="storeName">Store Name</Label>
-                  <Input
-                    id="storeName"
-                    defaultValue="Ramani Fashion"
-                    data-testid="input-store-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="storeEmail">Contact Email</Label>
-                  <Input
-                    id="storeEmail"
-                    type="email"
-                    defaultValue="contact@ramanifashion.com"
-                    data-testid="input-store-email"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="storePhone">Contact Phone</Label>
-                  <Input
-                    id="storePhone"
-                    defaultValue="+91 5555555555"
-                    data-testid="input-store-phone"
-                  />
-                </div>
-                <Button data-testid="button-save-settings">Save Changes</Button>
-              </CardContent>
-            </Card>
+                  <div className="space-y-2">
+                    <Label htmlFor="freeShippingThreshold">Free Shipping Threshold (₹)</Label>
+                    <Input
+                      id="freeShippingThreshold"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={freeShippingThreshold}
+                      onChange={(e) => setFreeShippingThreshold(e.target.value)}
+                      placeholder="Enter minimum cart value for free shipping (e.g., 999)"
+                      data-testid="input-free-shipping-threshold"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Minimum cart value required for free shipping. Shipping is free if cart total is equal to or greater than this amount.
+                    </p>
+                  </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Notifications</CardTitle>
-                <CardDescription>Manage your notification preferences</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="lowStockAlert">Low Stock Alerts</Label>
-                  <input type="checkbox" id="lowStockAlert" defaultChecked className="h-4 w-4" data-testid="checkbox-low-stock" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="newOrderAlert">New Order Notifications</Label>
-                  <input type="checkbox" id="newOrderAlert" defaultChecked className="h-4 w-4" data-testid="checkbox-new-order" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="customerAlert">New Customer Alerts</Label>
-                  <input type="checkbox" id="customerAlert" className="h-4 w-4" data-testid="checkbox-new-customer" />
-                </div>
+                  <div className="pt-4 border-t">
+                    <div className="bg-pink-50 dark:bg-pink-950/20 p-4 rounded-md mb-4">
+                      <h4 className="font-medium mb-2 text-sm">Current Configuration:</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li>• Shipping Charges: ₹{shippingCharges}</li>
+                        <li>• Free Shipping On Orders: ₹{freeShippingThreshold}+</li>
+                        <li>
+                          • Orders below ₹{freeShippingThreshold} will be charged ₹{shippingCharges}
+                        </li>
+                        <li>
+                          • Orders ₹{freeShippingThreshold} or above get FREE shipping
+                        </li>
+                      </ul>
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      disabled={updateSettingsMutation.isPending || isLoading}
+                      data-testid="button-save-shipping-settings"
+                    >
+                      {updateSettingsMutation.isPending ? "Saving..." : "Save Shipping Settings"}
+                    </Button>
+                  </div>
+                </form>
               </CardContent>
             </Card>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

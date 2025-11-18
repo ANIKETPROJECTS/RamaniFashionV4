@@ -19,9 +19,13 @@ export default function Cart() {
   const token = localStorage.getItem("token");
   const [guestCart, setGuestCart] = useState<any>(null);
 
-  const { data: cart, isLoading } = useQuery({
+  const { data: cart, isLoading, isFetching: cartFetching } = useQuery({
     queryKey: ["/api/cart"],
     enabled: !!token,
+  });
+
+  const { data: settings, isLoading: settingsLoading, isFetching: settingsFetching } = useQuery({
+    queryKey: ["/api/settings"],
   });
 
   useEffect(() => {
@@ -107,7 +111,7 @@ export default function Cart() {
     },
   });
 
-  if (token && isLoading) {
+  if ((token && (isLoading || cartFetching)) || settingsLoading || settingsFetching) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -136,7 +140,9 @@ export default function Cart() {
     return sum + (item.productId?.price || 0) * item.quantity;
   }, 0);
 
-  const shippingCharges = subtotal >= 999 ? 0 : 99;
+  const settingsShippingCharges = (settings as any)?.shippingCharges ?? 0;
+  const settingsFreeShippingThreshold = (settings as any)?.freeShippingThreshold ?? 999;
+  const shippingCharges = subtotal >= settingsFreeShippingThreshold ? 0 : settingsShippingCharges;
   const total = subtotal + shippingCharges;
 
   if (items.length === 0) {
@@ -280,9 +286,9 @@ export default function Cart() {
                       {shippingCharges === 0 ? 'FREE' : `₹${shippingCharges}`}
                     </span>
                   </div>
-                  {subtotal < 999 && (
+                  {subtotal < settingsFreeShippingThreshold && settingsShippingCharges > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      Add ₹{999 - subtotal} more for FREE delivery
+                      Add ₹{settingsFreeShippingThreshold - subtotal} more for FREE delivery
                     </p>
                   )}
                 </div>
