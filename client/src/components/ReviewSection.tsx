@@ -64,10 +64,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
   const createReviewMutation = useMutation({
     mutationFn: async (reviewData: { productId: string; rating: number; title: string; comment: string }) => {
-      return await apiRequest("/api/reviews", {
-        method: "POST",
-        body: JSON.stringify(reviewData),
-      });
+      return await apiRequest("/api/reviews", "POST", reviewData);
     },
     onSuccess: () => {
       toast({
@@ -92,9 +89,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
   const helpfulMutation = useMutation({
     mutationFn: async (reviewId: string) => {
-      return await apiRequest(`/api/reviews/${reviewId}/helpful`, {
-        method: "PUT",
-      });
+      return await apiRequest(`/api/reviews/${reviewId}/helpful`, "PUT");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/reviews", productId] });
