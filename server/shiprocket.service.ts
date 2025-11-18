@@ -124,7 +124,13 @@ class ShiprocketService {
 
   async createOrder(orderData: ShiprocketOrderRequest): Promise<ShiprocketOrderResponse> {
     try {
+      console.log('\n🔐 Getting Shiprocket auth token...');
       const token = await this.getAuthToken();
+      console.log('✅ Token obtained, creating order...');
+      
+      console.log('\n📨 Shiprocket API Request:');
+      console.log('URL:', `${SHIPROCKET_BASE_URL}/orders/create/adhoc`);
+      console.log('Order Data:', JSON.stringify(orderData, null, 2));
       
       const response = await axios.post(
         `${SHIPROCKET_BASE_URL}/orders/create/adhoc`,
@@ -137,10 +143,14 @@ class ShiprocketService {
         }
       );
 
-      console.log('✅ Shiprocket order created:', response.data);
+      console.log('\n✅ Shiprocket order created successfully!');
+      console.log('Response:', JSON.stringify(response.data, null, 2));
       return response.data;
     } catch (error: any) {
-      console.error('❌ Failed to create Shiprocket order:', error.response?.data || error.message);
+      console.error('\n❌ SHIPROCKET ORDER CREATION FAILED');
+      console.error('Error Response:', JSON.stringify(error.response?.data, null, 2));
+      console.error('Error Message:', error.message);
+      console.error('Status Code:', error.response?.status);
       throw new Error(error.response?.data?.message || 'Failed to create Shiprocket order');
     }
   }

@@ -1942,18 +1942,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/admin/orders/:id/approve", authenticateAdmin, async (req, res) => {
+    console.log('\n=== ORDER APPROVAL STARTED ===');
+    console.log('Order ID:', req.params.id);
+    console.log('Admin:', req.admin.username);
+    console.log('Timestamp:', new Date().toISOString());
+    
     try {
       const order = await Order.findById(req.params.id).populate('userId', 'name email phone');
       
       if (!order) {
+        console.error('❌ Order not found:', req.params.id);
         return res.status(404).json({ error: 'Order not found' });
       }
 
+      console.log('Order found:', {
+        orderNumber: order.orderNumber,
+        approved: order.approved,
+        paymentStatus: order.paymentStatus,
+        orderStatus: order.orderStatus
+      });
+
       if (order.approved) {
+        console.error('❌ Order already approved');
         return res.status(400).json({ error: 'Order already approved' });
       }
 
       if (order.paymentStatus !== 'paid') {
+        console.error('❌ Payment not completed. Payment status:', order.paymentStatus);
         return res.status(400).json({ error: 'Payment must be completed before approving order' });
       }
 
@@ -1996,7 +2011,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         weight: totalWeight
       };
 
+      console.log('\n📦 Sending order to Shiprocket:');
+      console.log('Order Number:', shiprocketOrderData.order_id);
+      console.log('Customer:', firstName, lastName);
+      console.log('City:', shiprocketOrderData.billing_city);
+      console.log('Pincode:', shiprocketOrderData.billing_pincode);
+      console.log('Items:', orderItems.length);
+      console.log('Payment Method:', shiprocketOrderData.payment_method);
+      console.log('Weight:', totalWeight, 'kg');
+
       const shiprocketResponse = await shiprocketService.createOrder(shiprocketOrderData);
+      
+      console.log('\n✅ Shiprocket Response:');
+      console.log('Order ID:', shiprocketResponse.order_id);
+      console.log('Shipment ID:', shiprocketResponse.shipment_id);
+      console.log('Status:', shiprocketResponse.status);
 
       order.approved = true;
       order.approvedBy = req.admin.username;
@@ -2030,7 +2059,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      console.log(`✅ Order ${order.orderNumber} approved and sent to Shiprocket`);
+      console.log(`\n✅ Order ${order.orderNumber} approved and sent to Shiprocket`);
+      console.log('=== ORDER APPROVAL COMPLETED ===\n');
 
       const populatedOrder = await Order.findById(order._id)
         .populate('userId', 'name email phone')
@@ -2038,7 +2068,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(populatedOrder);
     } catch (error: any) {
-      console.error('Order approval failed:', error.message);
+      console.error('\n❌ ORDER APPROVAL FAILED ===');
+      console.error('Error:', error.message);
+      console.error('Stack:', error.stack);
+      console.error('=== END ERROR ===\n');
       res.status(500).json({ error: error.message || 'Failed to approve order and create shipment' });
     }
   });

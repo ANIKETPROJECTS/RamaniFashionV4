@@ -148,9 +148,14 @@ export default function OrderManagement() {
   });
 
   const approveOrderMutation = useMutation({
-    mutationFn: (orderId: string) => 
-      apiRequest(`/api/admin/orders/${orderId}/approve`, "POST"),
-    onSuccess: () => {
+    mutationFn: (orderId: string) => {
+      console.log('\n🚀 APPROVING ORDER');
+      console.log('Order ID:', orderId);
+      console.log('Timestamp:', new Date().toISOString());
+      return apiRequest(`/api/admin/orders/${orderId}/approve`, "POST");
+    },
+    onSuccess: (data) => {
+      console.log('✅ Order approved successfully!', data);
       queryClient.invalidateQueries({ queryKey: ['/api/admin/orders'] });
       toast({ 
         title: "Order approved successfully!", 
@@ -160,6 +165,9 @@ export default function OrderManagement() {
       setSelectedOrder(null);
     },
     onError: (error: any) => {
+      console.error('❌ Order approval failed:', error);
+      console.error('Error message:', error.message);
+      console.error('Full error:', JSON.stringify(error, null, 2));
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   });
