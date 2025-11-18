@@ -134,8 +134,10 @@ export default function ReviewManagement() {
     },
     onSuccess: (data, review) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/reviews"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["/api/reviews", review.productId._id], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["/api/products", review.productId._id] });
+      if (review.productId?._id) {
+        queryClient.invalidateQueries({ queryKey: ["/api/reviews", review.productId._id], exact: false });
+        queryClient.invalidateQueries({ queryKey: ["/api/products", review.productId._id] });
+      }
       toast({
         title: "Review deleted",
         description: "The review has been successfully deleted.",
