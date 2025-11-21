@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: 'ramaniV1',
+    name: 'ramaniV2',
     script: './dist/index.js',  // Run the built backend directly
     env: {
       NODE_ENV: 'production',
