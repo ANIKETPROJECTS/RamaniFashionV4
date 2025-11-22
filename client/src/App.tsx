@@ -32,6 +32,7 @@ import ReviewManagement from "@/pages/admin/ReviewManagement";
 import Analytics from "@/pages/admin/Analytics";
 import Settings from "@/pages/admin/Settings";
 import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
 import Shipping from "@/pages/Shipping";
 import Returns from "@/pages/Returns";
 import FAQ from "@/pages/FAQ";
@@ -57,8 +58,7 @@ function Router() {
       <Route path="/orders" component={Orders} />
       <Route path="/wishlist" component={Wishlist} />
       <Route path="/privacy" component={Privacy} />
-      <Route path="/terms" component={Privacy} />
-      <Route path="/cookie-policy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
       <Route path="/shipping" component={Shipping} />
       <Route path="/returns" component={Returns} />
       <Route path="/faq" component={FAQ} />

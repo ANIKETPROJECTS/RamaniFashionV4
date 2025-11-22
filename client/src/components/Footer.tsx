@@ -132,8 +132,9 @@ export default function Footer() {
             <p>© 2025 Ramani Fashion India. All rights reserved.</p>
             <div className="flex gap-4">
               <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="link-privacy">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-primary transition-colors" data-testid="link-terms">Terms of Service</Link>
-              <Link href="/cookie-policy" className="hover:text-primary transition-colors" data-testid="link-cookies">Cookie Policy</Link>
+              <Link href="/terms" className="hover:text-primary transition-colors" data-testid="link-terms">Terms & Conditions</Link>
+              <Link href="/shipping" className="hover:text-primary transition-colors" data-testid="link-shipping-footer">Shipping Policy</Link>
+              <Link href="/returns" className="hover:text-primary transition-colors" data-testid="link-returns-footer">Return & Refund Policy</Link>
             </div>
           </div>
         </div>
