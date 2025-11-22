@@ -16,11 +16,12 @@ class PhonePeService {
       throw new Error('PhonePe credentials are missing. Please set PHONEPE_CLIENT_ID, PHONEPE_CLIENT_SECRET, and PHONEPE_MERCHANT_ID');
     }
 
-    const env = Env.PRODUCTION;
+    const phonepeMode = process.env.PHONEPE_MODE || 'PRODUCTION';
+    const env = phonepeMode === 'SANDBOX' ? Env.SANDBOX : Env.PRODUCTION;
     
     try {
       this.client = StandardCheckoutClient.getInstance(clientId, clientSecret, clientVersion, env);
-      console.log(`✅ PhonePe SDK initialized successfully in PRODUCTION mode`);
+      console.log(`✅ PhonePe SDK initialized successfully in ${phonepeMode} mode`);
       console.log(`   Client ID: ${clientId}`);
       console.log(`   Merchant ID: ${this.merchantId}`);
     } catch (error) {

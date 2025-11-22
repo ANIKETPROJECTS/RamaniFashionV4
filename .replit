@@ -15,6 +15,10 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
+localPort = 44239
+externalPort = 5000
+
+[[ports]]
 localPort = 45313
 externalPort = 3003
 
@@ -86,3 +90,4 @@ PHONEPE_SALT_INDEX = "5b5b1002-099f-4ae7-abda-a2507503a219"
 PHONEPE_SALT_KEY = "1"
 SHIPROCKET_API_EMAIL = "raneaniket23@gmail.com"
 SHIPROCKET_API_PASSWORD = "!ExeJ2E&MyR4sUbK"
+PHONEPE_MODE = "SANDBOX"
