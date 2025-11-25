@@ -882,11 +882,11 @@ export default function Home() {
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1">Phone</h3>
                         <a 
-                          href="tel:+915555555555" 
+                          href="tel:+919372494513" 
                           className="text-sm text-foreground hover:text-foreground/80 transition-colors"
                           data-testid="link-phone"
                         >
-                          +91 5555555555
+                          +91 93724 94513
                         </a>
                       </div>
                     </div>
@@ -898,11 +898,11 @@ export default function Home() {
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1">Email</h3>
                         <a 
-                          href="mailto:info@ramanifashion.in" 
+                          href="mailto:ramanifashion2024@gmail.com" 
                           className="text-sm text-foreground hover:text-foreground/80 transition-colors"
                           data-testid="link-email"
                         >
-                          info@ramanifashion.in
+                          ramanifashion2024@gmail.com
                         </a>
                       </div>
                     </div>
