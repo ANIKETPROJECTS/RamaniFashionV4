@@ -22,12 +22,12 @@ export default function Shipping() {
           <Card className="bg-white p-6 text-center">
             <Clock className="h-12 w-12 text-pink-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Standard Delivery</h3>
-            <p className="text-gray-700">5-10 business days</p>
+            <p className="text-gray-700">5-7 business days</p>
           </Card>
           <Card className="bg-white p-6 text-center">
             <Truck className="h-12 w-12 text-pink-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Express Delivery</h3>
-            <p className="text-gray-700">3-5 business days</p>
+            <p className="text-gray-700">2-3 business days</p>
           </Card>
         </div>
 
@@ -42,8 +42,8 @@ export default function Shipping() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Delivery Time</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-2">
-              <li><strong>Standard:</strong> 5–10 business days</li>
-              <li><strong>Express:</strong> 3-5 business days</li>
+              <li><strong>Standard:</strong> 5-7 business days</li>
+              <li><strong>Express:</strong> 2-3 business days</li>
             </ul>
           </section>
 
