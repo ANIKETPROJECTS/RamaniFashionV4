@@ -21,8 +21,8 @@ export default function Returns() {
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           <Card className="bg-white p-6 text-center">
             <Package className="h-12 w-12 text-pink-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">7 Days Return</h3>
-            <p className="text-gray-700">Returns accepted within 7 days of delivery</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">5 to 7 Working Days Return</h3>
+            <p className="text-gray-700">Returns accepted within 5 to 7 working days</p>
           </Card>
           <Card className="bg-white p-6 text-center">
             <CreditCard className="h-12 w-12 text-pink-500 mx-auto mb-4" />
@@ -35,7 +35,7 @@ export default function Returns() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Return Policy</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-2">
-              <li>Returns are accepted within 7 days of delivery for items.</li>
+              <li>Returns are accepted within 5 to 7 working days for items.</li>
               <li>Items must be unused and returned in original packaging.</li>
               <li>Proof of damage (photo/video) may be required.</li>
             </ul>
