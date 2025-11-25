@@ -10,11 +10,19 @@ import facebookIcon from "@assets/communication_1762445935759.png";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   const handleSubscribe = () => {
     console.log('Subscribe:', email);
     setEmail("");
+  };
+
+  const handleHomeClick = () => {
+    if (location === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      setLocation("/");
+    }
   };
 
   const handleContactClick = () => {
@@ -91,7 +99,7 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4 text-primary">Quick Links</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-home-footer">Home</Link></li>
+              <li><button onClick={handleHomeClick} className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-home-footer">Home</button></li>
               <li><Link href="/new-arrivals" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-new-arrivals-footer">New Arrivals</Link></li>
               <li><Link href="/trending-collection" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-trending-footer">Trending Collection</Link></li>
               <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-about-footer">About Us</Link></li>
