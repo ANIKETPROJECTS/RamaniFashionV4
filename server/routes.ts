@@ -1001,13 +1001,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const merchantOrderId = order.orderNumber || `RM${Date.now()}`;
       const amountInPaisa = Math.round(amount * 100);
       
-      // Use HOST_URL for production (custom domain), fallback to Replit domains
-      const baseUrl = process.env.HOST_URL 
-        || (process.env.REPLIT_DOMAINS 
-          ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
-          : `http://localhost:${process.env.PORT || 5000}`);
+      // Use HOST_URL for production (custom domain) - MUST be https://ramanifashion.in
+      const baseUrl = process.env.HOST_URL || 'https://ramanifashion.in';
       const redirectUrl = `${baseUrl}/payment-callback`;
       const callbackUrl = `${baseUrl}/api/payment/phonepe/webhook`;
+      
+      console.log('Payment initiation - Using baseUrl:', baseUrl, 'redirectUrl:', redirectUrl);
 
       const paymentResponse = await phonePeService.initiatePayment({
         merchantOrderId,
@@ -1120,6 +1119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const paymentData = JSON.parse(decodedResponse);
           merchantOrderId = paymentData.merchantOrderId || paymentData.merchantTransactionId;
           paymentStatus = paymentData.state || 'PENDING';
+          console.log('PhonePe callback received - Order ID:', merchantOrderId, 'Status:', paymentStatus);
         } catch (parseError) {
           console.error('Error parsing PhonePe response:', parseError);
         }
@@ -1128,18 +1128,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Find the frontend base URL (use HOST_URL)
       const frontendUrl = process.env.HOST_URL || 'https://ramanifashion.in';
 
-      // Redirect based on payment status
-      if (paymentStatus === 'COMPLETED' || paymentStatus === 'SUCCESS') {
-        return res.redirect(`${frontendUrl}/checkout?status=success&merchantOrderId=${merchantOrderId}`);
-      } else if (paymentStatus === 'FAILED') {
-        return res.redirect(`${frontendUrl}/checkout?status=failed&merchantOrderId=${merchantOrderId}`);
-      } else {
-        return res.redirect(`${frontendUrl}/checkout?status=pending&merchantOrderId=${merchantOrderId}`);
-      }
+      // Redirect to /orders after successful payment
+      return res.redirect(`${frontendUrl}/orders?paymentStatus=${paymentStatus}&merchantOrderId=${merchantOrderId}`);
     } catch (error: any) {
       console.error('Payment callback error:', error);
       const frontendUrl = process.env.HOST_URL || 'https://ramanifashion.in';
-      res.redirect(`${frontendUrl}/checkout?status=error`);
+      res.redirect(`${frontendUrl}/orders?paymentStatus=error`);
     }
   });
 
