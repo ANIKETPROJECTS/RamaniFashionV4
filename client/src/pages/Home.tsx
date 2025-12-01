@@ -74,15 +74,10 @@ export default function Home() {
 
   // Load uploaded ramani banner with fallback
   useEffect(() => {
-    fetch("/media/ramani-banner.png")
-      .then((res) => {
-        if (res.ok) {
-          setRamaniBanner("/media/ramani-banner.png");
-        } else {
-          setRamaniBanner(ramaniBannerStatic);
-        }
-      })
-      .catch(() => setRamaniBanner(ramaniBannerStatic));
+    const img = new Image();
+    img.onload = () => setRamaniBanner("/media/ramani-banner.png");
+    img.onerror = () => setRamaniBanner(ramaniBannerStatic);
+    img.src = "/media/ramani-banner.png";
   }, []);
 
   const { data: newArrivalsData } = useQuery({
