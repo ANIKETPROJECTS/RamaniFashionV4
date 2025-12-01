@@ -6,6 +6,13 @@ Ramani Fashion India is a full-stack e-commerce web application specializing in 
 
 ## Recent Changes
 
+### December 1, 2025
+- **Fixed Color Filter Visibility:** Resolved issue where the color filter was not visible on product grid pages (New Arrivals, Trending Collection, Sale):
+  - Reordered filter sections to place Color filter immediately after Categories (before Price Range) for better visibility
+  - Added scrollable sidebar with `max-h-[calc(100vh-6rem)] overflow-y-auto` to ensure all filter sections are accessible
+  - Color filter dynamically shows colors extracted from currently displayed products using `extractUniqueColorsFromProducts` utility
+  - Color swatches display as circular buttons with CSS color values mapped via `colorUtils.ts` (supports 50+ color names)
+
 ### November 18, 2025
 - **Integrated Shiprocket Shipping Service:** Implemented complete shipping workflow with admin approval process:
   - Created Shiprocket service module with JWT authentication, token caching, and API integration

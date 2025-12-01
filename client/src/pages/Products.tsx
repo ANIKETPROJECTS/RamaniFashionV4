@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -15,6 +15,7 @@ import { useLocation, useSearch } from "wouter";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { motion } from "framer-motion";
 import { colorPreferences } from "@/lib/colorPreferences";
+import { extractUniqueColorsFromProducts, getColorCssValue } from "@/lib/colorUtils";
 
 export default function Products() {
   const [location] = useLocation();
@@ -31,7 +32,7 @@ export default function Products() {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [isTrending, setIsTrending] = useState(false);
-  const [openSections, setOpenSections] = useState<string[]>(["categories", "price", "fabric"]);
+  const [openSections, setOpenSections] = useState<string[]>(["categories", "price", "color"]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(searchString);
@@ -156,8 +157,11 @@ export default function Products() {
 
   const categories = filtersData?.categories || ["Jamdani Paithani", "Khun / Irkal (Ilkal)", "Ajrakh Modal", "Mul Mul Cotton", "Khadi Cotton", "Patch Work", "Pure Linen"];
   const fabrics = filtersData?.fabrics || ["Silk", "Cotton", "Georgette", "Chiffon", "Net", "Crepe", "Chanderi", "Linen"];
-  const colors = filtersData?.colors || ["Red", "Blue", "Green", "Pink", "Yellow", "Black", "White", "Purple", "Maroon", "Grey"];
   const occasions = filtersData?.occasions || ["Wedding", "Party", "Festival", "Casual", "Office"];
+  
+  const productColors = useMemo(() => {
+    return extractUniqueColorsFromProducts(products);
+  }, [products]);
 
   const handleSortChange = (value: string) => {
     if (value === "none") {
@@ -429,33 +433,34 @@ export default function Products() {
                 </CollapsibleContent>
               </Collapsible> */}
 
-              {/* HIDDEN - Color Filter (Uncomment to re-enable) */}
-              {/* <Collapsible open={openSections.includes("color")}>
-                <CollapsibleTrigger 
-                  className="flex items-center justify-between w-full py-2 hover-elevate px-2 rounded-md"
-                  onClick={() => toggleSection("color")}
-                  data-testid="button-toggle-color"
-                >
-                  <span className="font-medium">Color</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("color") ? "rotate-180" : ""}`} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-2">
-                  <div className="grid grid-cols-5 gap-2">
-                    {colors.map((color: string) => (
-                      <button
-                        key={color}
-                        className={`w-8 h-8 rounded-full border-2 hover-elevate ${
-                          selectedColors.includes(color) ? 'border-primary ring-2 ring-primary' : 'border-border'
-                        }`}
-                        style={{ backgroundColor: color.toLowerCase() }}
-                        onClick={() => toggleColor(color)}
-                        title={color}
-                        data-testid={`button-color-${color.toLowerCase()}`}
-                      />
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible> */}
+              {productColors.length > 0 && (
+                <Collapsible open={openSections.includes("color")}>
+                  <CollapsibleTrigger 
+                    className="flex items-center justify-between w-full py-2 hover-elevate px-2 rounded-md"
+                    onClick={() => toggleSection("color")}
+                    data-testid="button-toggle-color"
+                  >
+                    <span className="font-medium">Color</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("color") ? "rotate-180" : ""}`} />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-2">
+                    <div className="grid grid-cols-5 gap-2">
+                      {productColors.map((color: string) => (
+                        <button
+                          key={color}
+                          className={`w-8 h-8 rounded-full border-2 hover-elevate ${
+                            selectedColors.includes(color) ? 'border-primary ring-2 ring-primary' : 'border-border'
+                          }`}
+                          style={{ backgroundColor: getColorCssValue(color) }}
+                          onClick={() => toggleColor(color)}
+                          title={color}
+                          data-testid={`button-color-${color.toLowerCase().replace(/\s+/g, '-')}`}
+                        />
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
             </div>
           </aside>
 

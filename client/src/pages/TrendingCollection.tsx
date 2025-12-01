@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,6 +16,7 @@ import { useLocation } from "wouter";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { motion } from "framer-motion";
 import { colorPreferences } from "@/lib/colorPreferences";
+import { extractUniqueColorsFromProducts, getColorCssValue } from "@/lib/colorUtils";
 
 export default function TrendingCollection() {
   const [location] = useLocation();
@@ -29,7 +30,7 @@ export default function TrendingCollection() {
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
-  const [openSections, setOpenSections] = useState<string[]>(["categories", "price", "fabric"]);
+  const [openSections, setOpenSections] = useState<string[]>(["categories", "price", "color"]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -143,8 +144,11 @@ export default function TrendingCollection() {
 
   const categories = filtersData?.categories || ["Jamdani Paithani", "Khun / Irkal (Ilkal)", "Ajrakh Modal", "Mul Mul Cotton", "Khadi Cotton", "Patch Work", "Pure Linen"];
   const fabrics = filtersData?.fabrics || ["Silk", "Cotton", "Georgette", "Chiffon", "Net", "Crepe", "Chanderi", "Linen"];
-  const colors = filtersData?.colors || ["Red", "Blue", "Green", "Pink", "Yellow", "Black", "White", "Purple", "Maroon", "Grey"];
   const occasions = filtersData?.occasions || ["Wedding", "Party", "Festival", "Casual", "Office"];
+  
+  const productColors = useMemo(() => {
+    return extractUniqueColorsFromProducts(products);
+  }, [products]);
 
   const handleSortChange = (value: string) => {
     if (value === "none") {
@@ -302,7 +306,7 @@ export default function TrendingCollection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <aside className="hidden lg:block lg:col-span-1">
-            <div className="sticky top-4 space-y-6">
+            <div className="sticky top-4 space-y-6 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Filters</h3>
                 {activeFiltersCount > 0 && (
@@ -336,6 +340,34 @@ export default function TrendingCollection() {
                   ))}
                 </CollapsibleContent>
               </Collapsible>
+
+              {productColors.length > 0 && (
+                <Collapsible open={openSections.includes("color")}>
+                  <CollapsibleTrigger 
+                    className="flex items-center justify-between w-full py-2 hover-elevate px-2 rounded-md"
+                    onClick={() => toggleSection("color")}
+                  >
+                    <span className="font-medium">Color</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("color") ? "rotate-180" : ""}`} />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-2">
+                    <div className="grid grid-cols-5 gap-3">
+                      {productColors.map((color: string) => (
+                        <button
+                          key={color}
+                          className={`w-10 h-10 rounded-full border-2 hover-elevate ${
+                            selectedColors.includes(color) ? 'border-primary ring-2 ring-primary' : 'border-border'
+                          }`}
+                          style={{ backgroundColor: getColorCssValue(color) }}
+                          onClick={() => toggleColor(color)}
+                          title={color}
+                          data-testid={`button-color-${color.toLowerCase().replace(/\s+/g, '-')}`}
+                        />
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
 
               <Collapsible open={openSections.includes("price")}>
                 <CollapsibleTrigger 
@@ -411,33 +443,6 @@ export default function TrendingCollection() {
                       </Label>
                     </div>
                   ))}
-                </CollapsibleContent>
-              </Collapsible> */}
-
-              {/* HIDDEN - Color Filter (Uncomment to re-enable) */}
-              {/* <Collapsible open={openSections.includes("color")}>
-                <CollapsibleTrigger 
-                  className="flex items-center justify-between w-full py-2 hover-elevate px-2 rounded-md"
-                  onClick={() => toggleSection("color")}
-                >
-                  <span className="font-medium">Color</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("color") ? "rotate-180" : ""}`} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-2">
-                  <div className="grid grid-cols-5 gap-3">
-                    {colors.map((color: string) => (
-                      <button
-                        key={color}
-                        className={`w-10 h-10 rounded-full border-2 hover-elevate ${
-                          selectedColors.includes(color) ? 'border-primary ring-2 ring-primary' : 'border-border'
-                        }`}
-                        style={{ backgroundColor: color.toLowerCase() }}
-                        onClick={() => toggleColor(color)}
-                        title={color}
-                        data-testid={`button-color-${color.toLowerCase()}`}
-                      />
-                    ))}
-                  </div>
                 </CollapsibleContent>
               </Collapsible> */}
             </div>
