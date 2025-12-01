@@ -11,13 +11,19 @@ export async function apiRequest(
   url: string,
   method: string,
   data?: unknown | undefined,
+  isFormData?: boolean,
 ): Promise<any> {
   const isAdminRoute = url.includes('/admin/');
   const token = isAdminRoute 
     ? localStorage.getItem("adminToken") 
     : localStorage.getItem("token");
   
-  const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
+  const headers: Record<string, string> = {};
+  
+  // Only set Content-Type for JSON data, not FormData (browser will set it automatically)
+  if (data && !isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
   
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -26,7 +32,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method,
     headers,
-    body: data ? JSON.stringify(data) : undefined,
+    body: data ? (isFormData ? (data as FormData) : JSON.stringify(data)) : undefined,
     credentials: "include",
   });
 

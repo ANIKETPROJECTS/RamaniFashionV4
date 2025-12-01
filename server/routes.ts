@@ -2397,6 +2397,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Media Upload Route - for hero banner, ramani banner, and video
+  app.post("/api/admin/upload-media", authenticateAdmin, (req, res) => {
+    upload.fields([
+      { name: 'hero', maxCount: 1 },
+      { name: 'banner', maxCount: 1 },
+      { name: 'video', maxCount: 1 }
+    ])(req, res, (err: any) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ error: 'File too large (max 50MB per file)' });
+        }
+        return res.status(400).json({ error: err.message });
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+
+      try {
+        const files = req.files as any;
+        const uploadedFiles: any = {};
+
+        if (files.hero && files.hero[0]) {
+          const heroPath = 'public/media/hero-banner.png';
+          fs.copyFileSync(files.hero[0].path, heroPath);
+          fs.unlinkSync(files.hero[0].path);
+          uploadedFiles.hero = '/media/hero-banner.png';
+        }
+
+        if (files.banner && files.banner[0]) {
+          const bannerPath = 'public/media/ramani-banner.png';
+          fs.copyFileSync(files.banner[0].path, bannerPath);
+          fs.unlinkSync(files.banner[0].path);
+          uploadedFiles.banner = '/media/ramani-banner.png';
+        }
+
+        if (files.video && files.video[0]) {
+          const videoPath = 'public/media/promotional-video.mp4';
+          fs.copyFileSync(files.video[0].path, videoPath);
+          fs.unlinkSync(files.video[0].path);
+          uploadedFiles.video = '/media/promotional-video.mp4';
+        }
+
+        res.json({
+          success: true,
+          files: uploadedFiles,
+          message: 'Media uploaded successfully'
+        });
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

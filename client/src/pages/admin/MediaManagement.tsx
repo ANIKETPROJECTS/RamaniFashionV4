@@ -29,7 +29,7 @@ export default function MediaManagement() {
 
   const uploadMutation = useMutation({
     mutationFn: async (data: FormData) =>
-      apiRequest("/api/admin/upload-media", "POST", data, true),
+      apiRequest("/api/admin/upload-media", "POST", data as any, true),
     onSuccess: () => {
       toast({
         title: "Media uploaded successfully!",
