@@ -376,7 +376,7 @@ export default function NewArrivals() {
                     <span className="font-medium">Color</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("color") ? "rotate-180" : ""}`} />
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-2 overflow-visible">
+                  <CollapsibleContent className="pt-2 pb-3 px-1 overflow-visible">
                     <div className="grid grid-cols-5 gap-3 overflow-visible">
                       {productColors.map((color: string) => (
                         <button
