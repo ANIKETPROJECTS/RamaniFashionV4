@@ -376,13 +376,13 @@ export default function NewArrivals() {
                     <span className="font-medium">Color</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openSections.includes("color") ? "rotate-180" : ""}`} />
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-2">
-                    <div className="grid grid-cols-5 gap-3">
+                  <CollapsibleContent className="pt-2 overflow-visible">
+                    <div className="grid grid-cols-5 gap-3 overflow-visible">
                       {productColors.map((color: string) => (
                         <button
                           key={color}
-                          className={`w-10 h-10 rounded-full border-2 hover-elevate ${
-                            selectedColors.includes(color) ? 'border-primary ring-2 ring-primary' : 'border-border'
+                          className={`w-10 h-10 rounded-full border-2 hover-elevate overflow-visible ${
+                            selectedColors.includes(color) ? 'border-primary ring-2 ring-primary ring-offset-1' : 'border-border'
                           }`}
                           style={{ backgroundColor: getColorCssValue(color) }}
                           onClick={() => toggleColor(color)}
