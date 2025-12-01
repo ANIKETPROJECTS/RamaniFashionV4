@@ -508,7 +508,6 @@ export default function Home() {
                   muted
                   loop
                   playsInline
-                  controls
                   data-testid="video-banner"
                 >
                   <source src={videoUrl} type="video/mp4" />
