@@ -24,8 +24,8 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for security
-const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+// File filter for images only
+const imageFileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Allowed image MIME types
   const allowedMimeTypes = [
     'image/jpeg',
@@ -46,14 +46,49 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
   }
 };
 
-// Multer configuration
+// File filter for media (images and videos)
+const mediaFileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  // Allowed media MIME types (images and videos)
+  const allowedMimeTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'video/mp4',
+    'video/webm',
+    'video/quicktime'
+  ];
+  
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4', '.webm', '.mov'];
+  const ext = path.extname(file.originalname).toLowerCase();
+  
+  // Check both MIME type AND extension for security
+  if (allowedMimeTypes.includes(file.mimetype) && allowedExtensions.includes(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WebP images and MP4, WebM, MOV videos are allowed.'));
+  }
+};
+
+// Multer configuration for product images
 export const upload = multer({
   storage: storage,
   limits: {
     fileSize: 50 * 1024 * 1024, // 50MB max file size
     files: 5                     // Max 5 files per request
   },
-  fileFilter: fileFilter
+  fileFilter: imageFileFilter
+});
+
+// Multer configuration for media uploads (images and videos)
+export const mediaUpload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB max file size for videos
+    files: 3                      // Max 3 files per request
+  },
+  fileFilter: mediaFileFilter
 });
 
 // Helper function to delete uploaded files

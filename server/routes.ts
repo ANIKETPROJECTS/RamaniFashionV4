@@ -9,7 +9,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import XLSX from "xlsx";
-import { upload } from "./upload-config";
+import { upload, mediaUpload } from "./upload-config";
 import { sendWhatsAppOTP, generateOTP } from "./whatsapp-service";
 import { phonePeService } from "./phonepe-service";
 import { shiprocketService } from "./shiprocket.service";
@@ -2399,7 +2399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Media Upload Route - for hero banner, ramani banner, and video
   app.post("/api/admin/upload-media", authenticateAdmin, (req, res) => {
-    upload.fields([
+    mediaUpload.fields([
       { name: 'hero', maxCount: 1 },
       { name: 'banner', maxCount: 1 },
       { name: 'video', maxCount: 1 }
