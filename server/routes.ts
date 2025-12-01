@@ -88,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       if (color) {
         const colors = (color as string).split(',').filter(Boolean);
-        query.color = colors.length > 1 ? { $in: colors } : colors[0];
+        query['colorVariants.color'] = colors.length > 1 ? { $in: colors } : colors[0];
       }
       if (occasion) {
         const occasions = (occasion as string).split(',').filter(Boolean);
@@ -1232,7 +1232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       if (color) {
         const colors = (color as string).split(',').filter(Boolean);
-        query.color = colors.length > 1 ? { $in: colors } : colors[0];
+        query['colorVariants.color'] = colors.length > 1 ? { $in: colors } : colors[0];
       }
       if (occasion) {
         const occasions = (occasion as string).split(',').filter(Boolean);
