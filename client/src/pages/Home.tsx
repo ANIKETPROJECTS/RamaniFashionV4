@@ -69,16 +69,16 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [ramaniBanner, setRamaniBanner] = useState(ramaniBannerStatic);
+  const [ramaniBanner, setRamaniBanner] = useState<string>(ramaniBannerStatic);
   const { toast } = useToast();
 
   // Load uploaded ramani banner with fallback
   useEffect(() => {
-    const ramaniBannerPath = "/media/ramani-banner.png";
-    const img = new Image();
-    img.onload = () => setRamaniBanner(ramaniBannerPath);
-    img.onerror = () => setRamaniBanner(ramaniBannerStatic);
-    img.src = ramaniBannerPath;
+    fetch("/media/ramani-banner.png")
+      .then((res) => {
+        if (res.ok) setRamaniBanner("/media/ramani-banner.png");
+      })
+      .catch(() => setRamaniBanner(ramaniBannerStatic));
   }, []);
 
   const { data: newArrivalsData } = useQuery({
