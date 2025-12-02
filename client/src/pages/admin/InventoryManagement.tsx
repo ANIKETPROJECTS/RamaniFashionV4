@@ -216,8 +216,9 @@ export default function InventoryManagement() {
       }
       const fullProduct = await response.json();
       
-      const images = fullProduct.images || 
-        (fullProduct.colorVariants && fullProduct.colorVariants[0]?.images) || 
+      const images = (fullProduct.images && fullProduct.images.length > 0) 
+        ? fullProduct.images
+        : (fullProduct.colorVariants && fullProduct.colorVariants[0]?.images) || 
         [];
       
       console.log("Full product:", fullProduct);
