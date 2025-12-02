@@ -289,6 +289,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // through the /api/admin/products endpoints with admin authentication.
   // Public access to products is read-only via GET /api/products and GET /api/products/:id
 
+  // Quick Search endpoint for header dropdown
+  app.get("/api/search", async (req, res) => {
+    try {
+      const { q, limit = '8' } = req.query;
+      
+      if (!q || (q as string).trim().length < 2) {
+        return res.json({ products: [] });
+      }
+
+      const searchTerm = (q as string).trim();
+      const limitNum = Math.min(parseInt(limit as string), 20);
+
+      // Search using regex for partial matches on name, category, and description
+      const searchRegex = new RegExp(searchTerm, 'i');
+      
+      const products = await Product.find({
+        $or: [
+          { name: searchRegex },
+          { category: searchRegex },
+          { description: searchRegex },
+          { fabric: searchRegex },
+          { occasion: searchRegex }
+        ]
+      })
+        .select('name price originalPrice images category colorVariants onSale')
+        .limit(limitNum)
+        .lean();
+
+      // Flatten products with color variants
+      const flattenedProducts = products.flatMap((product: any) => {
+        if (product.colorVariants && product.colorVariants.length > 0) {
+          return product.colorVariants.slice(0, 1).map((variant: any, index: number) => ({
+            _id: `${product._id}_variant_${index}`,
+            baseProductId: product._id,
+            name: product.name,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            category: product.category,
+            onSale: product.onSale,
+            displayColor: variant.color,
+            displayImage: variant.images?.[0] || product.images?.[0] || '',
+          }));
+        }
+        return [{
+          _id: product._id,
+          baseProductId: product._id,
+          name: product.name,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          category: product.category,
+          onSale: product.onSale,
+          displayImage: product.images?.[0] || '',
+        }];
+      });
+
+      res.json({ products: flattenedProducts.slice(0, limitNum) });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Review Routes
   app.get("/api/reviews/:productId", async (req, res) => {
     try {

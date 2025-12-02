@@ -1,17 +1,18 @@
-import { ShoppingBag, Heart, User, Search, Menu, LogOut, ChevronDown, ChevronRight } from "lucide-react";
+import { ShoppingBag, Heart, User, Search, Menu, LogOut, ChevronDown, ChevronRight, Loader2, X } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import instagramIcon from "@assets/instagram_1762445939344.png";
 import facebookIcon from "@assets/communication_1762445935759.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect, type MouseEvent } from "react";
+import { useState, useEffect, useRef, useCallback, type MouseEvent } from "react";
 import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { LoginDialog } from "@/components/LoginDialog";
 import { auth } from "@/lib/auth";
 import { useAuthUI } from "@/contexts/AuthUIContext";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +53,18 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
+interface SearchProduct {
+  _id: string;
+  baseProductId: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  category: string;
+  onSale?: boolean;
+  displayColor?: string;
+  displayImage: string;
+}
+
 export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useLocation();
@@ -60,6 +73,98 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const { isLoginOpen, openLogin, closeLogin } = useAuthUI();
+  
+  // Search dropdown state
+  const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced search function
+  const performSearch = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=8`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.products || []);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Handle search input change with debounce
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setShowDropdown(true);
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      performSearch(value);
+    }, 300);
+  };
+
+  // Handle search input focus
+  const handleSearchFocus = () => {
+    setShowDropdown(true);
+    if (searchQuery.trim().length >= 2 && searchResults.length === 0) {
+      performSearch(searchQuery);
+    }
+  };
+
+  // Handle product click from search results
+  const handleProductClick = (productId: string) => {
+    setShowDropdown(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    setLocation(`/product/${productId}`);
+  };
+
+  // Handle search submit (Enter key or search all)
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (searchQuery.trim()) {
+      setShowDropdown(false);
+      setLocation(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: globalThis.MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   // Parse URL to determine active navigation state
   const getActiveNavState = () => {
@@ -277,16 +382,115 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
           </div>
 
           <div className="flex items-center justify-end gap-6">
-            <div className="hidden md:flex items-center relative">
-              <Search className="absolute left-4 h-6 w-6 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-6 py-3 w-80 text-base bg-gray-50 border-gray-200 rounded-full focus:bg-white transition-colors"
-                data-testid="input-search"
-              />
+            <div ref={searchRef} className="hidden md:flex items-center relative">
+              <form onSubmit={handleSearchSubmit} className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
+                <Input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={handleSearchFocus}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
+                  className="pl-11 pr-10 py-2.5 w-80 text-base bg-gray-50 border-gray-200 rounded-full focus:bg-white transition-colors"
+                  data-testid="input-search"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSearchResults([]);
+                      setShowDropdown(false);
+                      searchInputRef.current?.focus();
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    data-testid="button-clear-search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </form>
+
+              {/* Search Dropdown */}
+              {showDropdown && (searchQuery.trim().length >= 2 || isSearching) && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
+                  {isSearching ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="ml-2 text-sm text-muted-foreground">Searching...</span>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <>
+                      <ScrollArea className="max-h-[400px]">
+                        <div className="py-2">
+                          {searchResults.map((product) => (
+                            <button
+                              key={product._id}
+                              onClick={() => handleProductClick(product._id)}
+                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                              data-testid={`search-result-${product._id}`}
+                            >
+                              <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
+                                {product.displayImage ? (
+                                  <img
+                                    src={product.displayImage}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                    <Search className="h-5 w-5" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {product.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {product.category}
+                                  {product.displayColor && ` - ${product.displayColor}`}
+                                </p>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-sm font-semibold text-primary">
+                                    Rs. {product.price.toLocaleString('en-IN')}
+                                  </span>
+                                  {product.originalPrice && product.originalPrice > product.price && (
+                                    <span className="text-xs text-muted-foreground line-through">
+                                      Rs. {product.originalPrice.toLocaleString('en-IN')}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                      <div className="border-t px-4 py-3">
+                        <button
+                          onClick={handleSearchSubmit}
+                          className="w-full text-center text-sm text-primary hover:text-primary/80 font-medium"
+                          data-testid="button-view-all-results"
+                        >
+                          View all results for "{searchQuery}"
+                        </button>
+                      </div>
+                    </>
+                  ) : searchQuery.trim().length >= 2 ? (
+                    <div className="py-8 px-4 text-center">
+                      <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">
+                        No products found for "{searchQuery}"
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Try a different search term
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
 
             {user ? (
