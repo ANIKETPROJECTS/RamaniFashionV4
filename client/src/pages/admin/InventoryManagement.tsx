@@ -51,6 +51,7 @@ export default function InventoryManagement() {
 
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -204,37 +205,59 @@ export default function InventoryManagement() {
     }
   });
 
-  const handleEdit = (product: any) => {
-    setEditingProduct(product);
-    const images = product.images || (product.colorVariants && product.colorVariants[0]?.images) || [];
-    setUploadedImages(images);
-    setProductForm({
-      name: product.name || "",
-      description: product.description || "",
-      price: product.price?.toString() || "",
-      originalPrice: product.originalPrice?.toString() || "",
-      category: product.category || "",
-      subcategory: product.subcategory || "",
-      fabric: product.fabric || "",
-      color: product.color || (product.colorVariants && product.colorVariants[0]?.color) || "",
-      occasion: product.occasion || "",
-      pattern: product.pattern || "",
-      workType: product.workType || "",
-      blousePiece: product.blousePiece || false,
-      sareeLength: product.sareeLength || "",
-      stockQuantity: product.stockQuantity?.toString() || "",
-      inStock: product.inStock !== false,
-      isNew: product.isNew || false,
-      isTrending: product.isTrending || false,
-      isBestseller: product.isBestseller || false,
-      onSale: product.onSale || false,
-      fabricComposition: product.specifications?.fabricComposition || "",
-      dimensions: product.specifications?.dimensions || "",
-      weight: product.specifications?.weight || "",
-      careInstructions: product.specifications?.careInstructions || "",
-      countryOfOrigin: product.specifications?.countryOfOrigin || ""
-    });
+  const handleEdit = async (product: any) => {
+    setIsLoadingProduct(true);
     setIsEditDialogOpen(true);
+    
+    try {
+      const response = await fetch(`/api/products/${product._id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch product details');
+      }
+      const fullProduct = await response.json();
+      
+      const images = fullProduct.images || 
+        (fullProduct.colorVariants && fullProduct.colorVariants[0]?.images) || 
+        [];
+      
+      setEditingProduct(fullProduct);
+      setUploadedImages(images);
+      setProductForm({
+        name: fullProduct.name || "",
+        description: fullProduct.description || "",
+        price: fullProduct.price?.toString() || "",
+        originalPrice: fullProduct.originalPrice?.toString() || "",
+        category: fullProduct.category || "",
+        subcategory: fullProduct.subcategory || "",
+        fabric: fullProduct.fabric || "",
+        color: fullProduct.color || (fullProduct.colorVariants && fullProduct.colorVariants[0]?.color) || "",
+        occasion: fullProduct.occasion || "",
+        pattern: fullProduct.pattern || "",
+        workType: fullProduct.workType || "",
+        blousePiece: fullProduct.blousePiece || false,
+        sareeLength: fullProduct.sareeLength || "",
+        stockQuantity: fullProduct.stockQuantity?.toString() || "",
+        inStock: fullProduct.inStock !== false,
+        isNew: fullProduct.isNew || false,
+        isTrending: fullProduct.isTrending || false,
+        isBestseller: fullProduct.isBestseller || false,
+        onSale: fullProduct.onSale || false,
+        fabricComposition: fullProduct.specifications?.fabricComposition || "",
+        dimensions: fullProduct.specifications?.dimensions || "",
+        weight: fullProduct.specifications?.weight || "",
+        careInstructions: fullProduct.specifications?.careInstructions || "",
+        countryOfOrigin: fullProduct.specifications?.countryOfOrigin || ""
+      });
+    } catch (error: any) {
+      toast({ 
+        title: "Error loading product", 
+        description: error.message,
+        variant: "destructive" 
+      });
+      setIsEditDialogOpen(false);
+    } finally {
+      setIsLoadingProduct(false);
+    }
   };
   
   const handleCloseEditDialog = () => {
@@ -616,7 +639,15 @@ export default function InventoryManagement() {
           <DialogHeader>
             <DialogTitle data-testid="text-edit-dialog-title">Edit Product</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {isLoadingProduct ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading product details...</p>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label data-testid="label-edit-product-images">Product Images (Max 5)</Label>
               <div className="flex gap-2 flex-wrap">
@@ -964,6 +995,7 @@ export default function InventoryManagement() {
               </Button>
             </div>
           </form>
+          )}
         </DialogContent>
       </Dialog>
 
