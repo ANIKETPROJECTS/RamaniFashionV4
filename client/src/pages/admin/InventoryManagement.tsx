@@ -220,6 +220,9 @@ export default function InventoryManagement() {
         (fullProduct.colorVariants && fullProduct.colorVariants[0]?.images) || 
         [];
       
+      console.log("Full product:", fullProduct);
+      console.log("Images found:", images);
+      
       setEditingProduct(fullProduct);
       setUploadedImages(images);
       setProductForm({
