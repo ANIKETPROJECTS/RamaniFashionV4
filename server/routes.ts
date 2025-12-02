@@ -1745,6 +1745,150 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sales: Math.round(item.sales)
       }));
 
+      // Customer growth over last 6 months
+      const customerGrowth = await Customer.aggregate([
+        {
+          $match: { createdAt: { $gte: sixMonthsAgo } }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            customers: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1 }
+        }
+      ]);
+
+      // Build cumulative customer growth data
+      let cumulativeCustomers = 0;
+      // Get count of customers before 6 months ago
+      const customersBeforePeriod = await Customer.countDocuments({ 
+        createdAt: { $lt: sixMonthsAgo } 
+      });
+      cumulativeCustomers = customersBeforePeriod;
+
+      const customerGrowthData = customerGrowth.map(item => {
+        cumulativeCustomers += item.customers;
+        return {
+          month: monthNames[item._id.month - 1],
+          customers: cumulativeCustomers,
+          newCustomers: item.customers
+        };
+      });
+
+      // Order status trends over last 6 months
+      const orderStatusTrends = await Order.aggregate([
+        {
+          $match: { createdAt: { $gte: sixMonthsAgo } }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" },
+              status: "$orderStatus"
+            },
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1 }
+        }
+      ]);
+
+      // Organize order status by month
+      const orderTrendsMap = new Map();
+      orderStatusTrends.forEach(item => {
+        const monthKey = `${item._id.year}-${item._id.month}`;
+        if (!orderTrendsMap.has(monthKey)) {
+          orderTrendsMap.set(monthKey, {
+            month: monthNames[item._id.month - 1],
+            completed: 0,
+            pending: 0,
+            cancelled: 0,
+            processing: 0,
+            shipped: 0
+          });
+        }
+        const monthData = orderTrendsMap.get(monthKey);
+        const status = (item._id.status || 'pending').toLowerCase();
+        if (status === 'delivered' || status === 'completed') {
+          monthData.completed += item.count;
+        } else if (status === 'pending') {
+          monthData.pending += item.count;
+        } else if (status === 'cancelled') {
+          monthData.cancelled += item.count;
+        } else if (status === 'processing' || status === 'confirmed') {
+          monthData.processing += item.count;
+        } else if (status === 'shipped') {
+          monthData.shipped += item.count;
+        }
+      });
+
+      const orderTrendsData = Array.from(orderTrendsMap.values());
+
+      // Calculate growth percentages
+      const currentMonthOrders = orders.filter(o => {
+        const orderDate = new Date(o.createdAt);
+        const now = new Date();
+        return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+      }).length;
+
+      const lastMonthOrders = orders.filter(o => {
+        const orderDate = new Date(o.createdAt);
+        const now = new Date();
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+        return orderDate.getMonth() === lastMonth.getMonth() && orderDate.getFullYear() === lastMonth.getFullYear();
+      }).length;
+
+      const orderGrowth = lastMonthOrders > 0 
+        ? Math.round(((currentMonthOrders - lastMonthOrders) / lastMonthOrders) * 100) 
+        : 0;
+
+      // Customer growth calculation
+      const allCustomers = await Customer.find().lean();
+      const currentMonthCustomers = allCustomers.filter(c => {
+        const regDate = new Date(c.createdAt);
+        const now = new Date();
+        return regDate.getMonth() === now.getMonth() && regDate.getFullYear() === now.getFullYear();
+      }).length;
+
+      const lastMonthCustomers = allCustomers.filter(c => {
+        const regDate = new Date(c.createdAt);
+        const now = new Date();
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+        return regDate.getMonth() === lastMonth.getMonth() && regDate.getFullYear() === lastMonth.getFullYear();
+      }).length;
+
+      const customerGrowthPercentage = lastMonthCustomers > 0 
+        ? Math.round(((currentMonthCustomers - lastMonthCustomers) / lastMonthCustomers) * 100) 
+        : currentMonthCustomers > 0 ? 100 : 0;
+
+      // Average order value growth
+      const currentMonthRevenue = orders.filter(o => {
+        const orderDate = new Date(o.createdAt);
+        const now = new Date();
+        return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+      }).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+      const lastMonthRevenue = orders.filter(o => {
+        const orderDate = new Date(o.createdAt);
+        const now = new Date();
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
+        return orderDate.getMonth() === lastMonth.getMonth() && orderDate.getFullYear() === lastMonth.getFullYear();
+      }).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+      const currentAvgOrderValue = currentMonthOrders > 0 ? currentMonthRevenue / currentMonthOrders : 0;
+      const lastAvgOrderValue = lastMonthOrders > 0 ? lastMonthRevenue / lastMonthOrders : 0;
+      const avgOrderValueGrowth = lastAvgOrderValue > 0 
+        ? Math.round(((currentAvgOrderValue - lastAvgOrderValue) / lastAvgOrderValue) * 100) 
+        : 0;
+
       res.json({
         totalProducts,
         totalUsers,
@@ -1756,7 +1900,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         topProducts,
         salesData,
         categoryData,
-        recentActivity
+        recentActivity,
+        customerGrowthData,
+        orderTrendsData,
+        growthStats: {
+          orderGrowth,
+          customerGrowthPercentage,
+          avgOrderValueGrowth
+        }
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

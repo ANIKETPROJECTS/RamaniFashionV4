@@ -14,6 +14,7 @@ import {
   ShoppingBag,
   Heart,
   ArrowUpRight,
+  ArrowDownRight,
   IndianRupee
 } from "lucide-react";
 import {
@@ -27,8 +28,30 @@ import {
   Tooltip,
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
+  Legend
 } from "recharts";
+
+interface AnalyticsData {
+  totalProducts: number;
+  totalUsers: number;
+  totalOrders: number;
+  totalRevenue: number;
+  lowStockProducts: number;
+  outOfStockProducts: number;
+  recentOrders: any[];
+  topProducts: any[];
+  salesData: { month: string; revenue: number; orders: number }[];
+  categoryData: { name: string; value: number; percentage: number }[];
+  recentActivity: { month: string; sales: number }[];
+  customerGrowthData: { month: string; customers: number; newCustomers: number }[];
+  orderTrendsData: { month: string; completed: number; pending: number; cancelled: number; processing: number; shipped: number }[];
+  growthStats: {
+    orderGrowth: number;
+    customerGrowthPercentage: number;
+    avgOrderValueGrowth: number;
+  };
+}
 
 export default function Analytics() {
   const adminToken = localStorage.getItem("adminToken");
@@ -49,28 +72,18 @@ export default function Analytics() {
     enabled: !!adminToken
   });
 
+  const { data: analyticsData, isLoading: loadingAnalytics } = useQuery<AnalyticsData>({
+    queryKey: ["/api/admin/analytics"],
+    enabled: !!adminToken
+  });
+
   const customers = customersData?.customers || [];
   const orders = ordersData?.orders || [];
 
-  // Sample data for customer growth chart
-  const customerGrowth = [
-    { month: 'Jan', customers: 120 },
-    { month: 'Feb', customers: 145 },
-    { month: 'Mar', customers: 178 },
-    { month: 'Apr', customers: 210 },
-    { month: 'May', customers: 245 },
-    { month: 'Jun', customers: 280 },
-  ];
-
-  // Sample data for order trends
-  const orderTrends = [
-    { month: 'Jan', completed: 95, pending: 15, cancelled: 10 },
-    { month: 'Feb', completed: 110, pending: 20, cancelled: 15 },
-    { month: 'Mar', completed: 125, pending: 18, cancelled: 12 },
-    { month: 'Apr', completed: 145, pending: 22, cancelled: 8 },
-    { month: 'May', completed: 155, pending: 25, cancelled: 10 },
-    { month: 'Jun', completed: 175, pending: 28, cancelled: 7 },
-  ];
+  // Use real data from analytics API or fallback to empty arrays
+  const customerGrowth = analyticsData?.customerGrowthData || [];
+  const orderTrends = analyticsData?.orderTrendsData || [];
+  const growthStats = analyticsData?.growthStats || { orderGrowth: 0, customerGrowthPercentage: 0, avgOrderValueGrowth: 0 };
 
   const avgOrderValue = orders.length 
     ? Math.round(orders.reduce((sum: number, o: any) => sum + (o.total || o.totalAmount || 0), 0) / orders.length)
@@ -90,7 +103,7 @@ export default function Analytics() {
             </p>
           </div>
 
-          {loadingCustomers ? (
+          {(loadingCustomers || loadingAnalytics) ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
                 <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -113,8 +126,14 @@ export default function Analytics() {
                       {customers.length}
                     </div>
                     <p className="text-xs text-muted-foreground flex items-center">
-                      <ArrowUpRight className="h-3 w-3 text-green-600 mr-1" />
-                      <span className="text-green-600 font-medium">18%</span> growth this month
+                      {growthStats.customerGrowthPercentage >= 0 ? (
+                        <ArrowUpRight className="h-3 w-3 text-green-600 mr-1" />
+                      ) : (
+                        <ArrowDownRight className="h-3 w-3 text-red-600 mr-1" />
+                      )}
+                      <span className={`font-medium ${growthStats.customerGrowthPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {Math.abs(growthStats.customerGrowthPercentage)}%
+                      </span> {growthStats.customerGrowthPercentage >= 0 ? 'growth' : 'decline'} this month
                     </p>
                   </CardContent>
                 </Card>
@@ -131,8 +150,14 @@ export default function Analytics() {
                       {orders.length}
                     </div>
                     <p className="text-xs text-muted-foreground flex items-center">
-                      <ArrowUpRight className="h-3 w-3 text-green-600 mr-1" />
-                      <span className="text-green-600 font-medium">12%</span> from last month
+                      {growthStats.orderGrowth >= 0 ? (
+                        <ArrowUpRight className="h-3 w-3 text-green-600 mr-1" />
+                      ) : (
+                        <ArrowDownRight className="h-3 w-3 text-red-600 mr-1" />
+                      )}
+                      <span className={`font-medium ${growthStats.orderGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {Math.abs(growthStats.orderGrowth)}%
+                      </span> from last month
                     </p>
                   </CardContent>
                 </Card>
@@ -149,8 +174,12 @@ export default function Analytics() {
                       ₹{avgOrderValue.toLocaleString()}
                     </div>
                     <p className="text-xs text-pink-100 flex items-center">
-                      <ArrowUpRight className="h-3 w-3 mr-1" />
-                      <span className="font-medium">8%</span> increase this month
+                      {growthStats.avgOrderValueGrowth >= 0 ? (
+                        <ArrowUpRight className="h-3 w-3 mr-1" />
+                      ) : (
+                        <ArrowDownRight className="h-3 w-3 mr-1" />
+                      )}
+                      <span className="font-medium">{Math.abs(growthStats.avgOrderValueGrowth)}%</span> {growthStats.avgOrderValueGrowth >= 0 ? 'increase' : 'decrease'} this month
                     </p>
                   </CardContent>
                 </Card>
@@ -162,38 +191,52 @@ export default function Analytics() {
                 <Card className="border-pink-100 dark:border-gray-700 shadow-md">
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Customer Growth</CardTitle>
-                    <CardDescription>New customer registrations over time</CardDescription>
+                    <CardDescription>Cumulative customer count over the last 6 months</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart data={customerGrowth}>
-                        <defs>
-                          <linearGradient id="colorCustomers" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                        <XAxis dataKey="month" stroke="#64748b" style={{ fontSize: '12px' }} />
-                        <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'white', 
-                            border: '1px solid #e9d5ff',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                          }} 
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="customers" 
-                          stroke="#8b5cf6" 
-                          strokeWidth={2}
-                          fillOpacity={1} 
-                          fill="url(#colorCustomers)" 
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                    {customerGrowth.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={customerGrowth}>
+                          <defs>
+                            <linearGradient id="colorCustomers" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                          <XAxis dataKey="month" stroke="#64748b" style={{ fontSize: '12px' }} />
+                          <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'white', 
+                              border: '1px solid #e9d5ff',
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                            }} 
+                            formatter={(value: number, name: string) => [
+                              value,
+                              name === 'customers' ? 'Total Customers' : 'New This Month'
+                            ]}
+                          />
+                          <Legend 
+                            formatter={(value) => value === 'customers' ? 'Total Customers' : 'New This Month'}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="customers" 
+                            name="customers"
+                            stroke="#8b5cf6" 
+                            strokeWidth={2}
+                            fillOpacity={1} 
+                            fill="url(#colorCustomers)" 
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                        No customer data available for the last 6 months
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -201,27 +244,34 @@ export default function Analytics() {
                 <Card className="border-pink-100 dark:border-gray-700 shadow-md">
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Order Status Trends</CardTitle>
-                    <CardDescription>Monthly order status breakdown</CardDescription>
+                    <CardDescription>Monthly order status breakdown (last 6 months)</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={orderTrends}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                        <XAxis dataKey="month" stroke="#64748b" style={{ fontSize: '12px' }} />
-                        <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'white', 
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                          }} 
-                        />
-                        <Bar dataKey="completed" fill="#10b981" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="pending" fill="#f59e0b" radius={[8, 8, 0, 0]} />
-                        <Bar dataKey="cancelled" fill="#ef4444" radius={[8, 8, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    {orderTrends.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={orderTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                          <XAxis dataKey="month" stroke="#64748b" style={{ fontSize: '12px' }} />
+                          <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'white', 
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                            }} 
+                          />
+                          <Legend />
+                          <Bar dataKey="completed" name="Completed" fill="#10b981" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="pending" name="Pending" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="cancelled" name="Cancelled" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                        No order data available for the last 6 months
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
