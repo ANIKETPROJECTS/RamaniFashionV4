@@ -222,6 +222,8 @@ export default function InventoryManagement() {
         [];
       
       console.log("Full product:", fullProduct);
+      console.log("fullProduct.images:", fullProduct.images);
+      console.log("fullProduct.colorVariants:", fullProduct.colorVariants);
       console.log("Images found:", images);
       
       setEditingProduct(fullProduct);
