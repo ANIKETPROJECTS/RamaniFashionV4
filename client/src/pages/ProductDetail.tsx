@@ -293,10 +293,11 @@ export default function ProductDetail() {
                 transition={{ duration: 0.3 }}
               >
                 <img
-                  src={images[selectedImage]}
+                  src={images[selectedImage] || "/default-saree.jpg"}
                   alt={product.name}
                   className="w-full h-auto aspect-[2/3] object-cover"
                   data-testid="img-product-main"
+                  onError={(e) => { e.currentTarget.src = '/default-saree.jpg'; }}
                 />
               </motion.div>
             </AnimatePresence>
@@ -312,9 +313,10 @@ export default function ProductDetail() {
                   data-testid={`button-thumbnail-${idx}`}
                 >
                   <img
-                    src={img}
+                    src={img || "/default-saree.jpg"}
                     alt={`${product.name} ${idx + 1}`}
                     className="w-full aspect-[3/4] object-cover"
+                    onError={(e) => { e.currentTarget.src = '/default-saree.jpg'; }}
                   />
                 </button>
               ))}
