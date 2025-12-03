@@ -434,17 +434,12 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                               data-testid={`search-result-${product._id}`}
                             >
                               <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
-                                {product.displayImage ? (
-                                  <img
-                                    src={product.displayImage}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                    <Search className="h-5 w-5" />
-                                  </div>
-                                )}
+                                <img
+                                  src={product.displayImage || "/default-saree.jpg"}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { e.currentTarget.src = '/default-saree.jpg'; }}
+                                />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate">

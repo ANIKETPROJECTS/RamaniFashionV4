@@ -500,7 +500,7 @@ export default function Products() {
                           baseProductId={product.baseProductId}
                           displayColor={product.displayColor}
                           name={product.name}
-                          image={displayImages[0] || "/api/placeholder/400/600"}
+                          image={displayImages[0] || "/default-saree.jpg"}
                           secondaryImage={displayImages[1]}
                           price={product.price}
                           originalPrice={product.originalPrice}

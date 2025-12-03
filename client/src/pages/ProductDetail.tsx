@@ -235,7 +235,7 @@ export default function ProductDetail() {
       ? currentColorVariant.images
       : product.images && product.images.length > 0
         ? product.images
-        : ["/api/placeholder/600/800"];
+        : ["/default-saree.jpg"];
 
   const discount = product.originalPrice
     ? Math.round(
@@ -814,7 +814,7 @@ export default function ProductDetail() {
                     image={
                       similarProduct.displayImages?.[0] ||
                       similarProduct.images?.[0] ||
-                      "/api/placeholder/400/600"
+                      "/default-saree.jpg"
                     }
                     rating={similarProduct.rating}
                     reviewCount={similarProduct.reviewCount}

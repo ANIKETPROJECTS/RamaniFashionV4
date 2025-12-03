@@ -134,10 +134,11 @@ export default function Orders() {
                       {order.items.map((item: any, index: number) => (
                         <div key={index} className="flex gap-4" data-testid={`order-item-${order._id}-${index}`}>
                           <img
-                            src={item.image || "/api/placeholder/80/100"}
+                            src={item.image || "/default-saree.jpg"}
                             alt={item.name}
                             className="w-16 h-20 object-cover rounded-md"
                             data-testid={`img-item-${index}`}
+                            onError={(e) => { e.currentTarget.src = '/default-saree.jpg'; }}
                           />
                           <div className="flex-1">
                             <h5 className="font-medium" data-testid={`text-item-name-${index}`}>{item.name}</h5>

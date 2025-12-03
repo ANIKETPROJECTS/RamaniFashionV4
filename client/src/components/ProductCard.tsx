@@ -177,11 +177,12 @@ export default function ProductCard({
     >
       <div className="relative aspect-[3/5] overflow-hidden">
         <img
-          src={currentImage}
+          src={currentImage || "/default-saree.jpg"}
           alt={name}
           className="w-full h-full object-cover"
           onMouseEnter={() => secondaryImage && setCurrentImage(secondaryImage)}
           onMouseLeave={() => setCurrentImage(image)}
+          onError={(e) => { e.currentTarget.src = '/default-saree.jpg'; }}
         />
         
         <Button

@@ -181,7 +181,7 @@ export default function Cart() {
               const displayImage = selectedColorVariant?.images?.[0] 
                 || product?.displayImages?.[0]
                 || product?.images?.[0] 
-                || "/api/placeholder/120/150";
+                || "/default-saree.jpg";
               
               return (
               <Card key={`${item.productId?._id}-${item.selectedColor || 'default'}`}>
@@ -192,6 +192,7 @@ export default function Cart() {
                       alt={product?.name}
                       className="w-24 h-32 object-cover rounded-md"
                       data-testid={`img-product-${product?._id}`}
+                      onError={(e) => { e.currentTarget.src = '/default-saree.jpg'; }}
                     />
                     
                     <div className="flex-1">
