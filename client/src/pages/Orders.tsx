@@ -209,7 +209,7 @@ export default function Orders() {
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Payment Method</span>
-                          <span>{getPaymentMethodDisplay(order.paymentMethod)}</span>
+                          <span className="uppercase">{order.paymentMethod}</span>
                         </div>
                       </div>
                     </div>
