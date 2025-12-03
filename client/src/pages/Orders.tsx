@@ -30,6 +30,13 @@ export default function Orders() {
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
+  const getPaymentMethodDisplay = (method: string) => {
+    if (method.toLowerCase() === 'cod') {
+      return 'COD';
+    }
+    return 'Online';
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -118,7 +125,7 @@ export default function Orders() {
                   <div className="flex flex-wrap gap-2">
                     <Badge className={getPaymentStatusColor(order.paymentStatus)} data-testid={`badge-payment-status-${order._id}`}>
                       {order.paymentStatus === 'paid' 
-                        ? `Paid via ${order.paymentMethod === 'cod' ? 'COD' : order.paymentMethod === 'phonepe' ? 'PhonePe' : order.paymentMethod?.toUpperCase() || 'Online'}` 
+                        ? `Paid via ${getPaymentMethodDisplay(order.paymentMethod)}` 
                         : order.paymentStatus === 'pending' 
                           ? 'Payment Pending' 
                           : 'Payment Failed'}
@@ -202,7 +209,7 @@ export default function Orders() {
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Payment Method</span>
-                          <span className="uppercase">{order.paymentMethod}</span>
+                          <span>{getPaymentMethodDisplay(order.paymentMethod)}</span>
                         </div>
                       </div>
                     </div>
